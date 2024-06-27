@@ -1,0 +1,92 @@
+<mvc:View
+    controllerName="com.app.parkinglotallocation.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+>
+    <App id="idApp">
+        <Page
+            id="idPage"
+            showHeader="false"
+            class="HomePageBackground"
+        >
+            <HBox
+                id="idHBoxMain"
+                class="mainContainer"
+                justifyContent="Center"
+                alignItems="Center"
+            >
+                <VBox
+                    id="idVBoxDescription"
+                    class="descriptionContainer"
+                >
+                    <Title
+                        id="idTextDescriptionTitle"
+                        text="Parking Lot Allocation Powered by Artihcus..!!"
+                        class="TextParkingLot"
+                    />
+                    <Text
+                        id="idTextDescription"
+                        text="#Welcome to Parking Lot Allocation..!"
+                        class="ParkingSubtitle"
+                        
+                    />
+                </VBox>
+                <VBox
+                    id="idVBoxLoginContainer"
+                    class="loginContainer"
+                    justifyContent="Center"
+                    alignItems="Center"
+                >
+                    <Title
+                        id="idTextParking"
+                        text="SMART PARKING PORTAL"
+                        level="H2"
+                    />
+                    <Panel
+                        id="idPanelParking"
+                        class="sapUiResponsiveMargin"
+                        width="auto"
+                    >
+                        <content>
+                            <Label
+                                id="idLabelUsername"
+                                text="Username:"
+                                labelFor="usernameInput"
+                            />
+                            <Input
+                                id="usernameInput"
+                                type="Text"
+                                placeholder="Enter your Username.."
+                            />
+                            <Label
+                                id="idLabelPassword"
+                                text="Password:"
+                                labelFor="passwordInput"
+                                class="sapUiSmallMarginTop"
+                            />
+                            <Input
+                                id="passwordInput"
+                                type="Password"
+                                placeholder="Enter your Password.."
+                            />
+                            <HBox
+                                id="idHBox"
+                                class="sapUiSmallMarginTop"
+                                justifyContent="End"
+                            >
+                                <Button
+                                    id="idButtonLogin"
+                                    text="Login"
+                                    type="Ghost"
+                                    press="onLoginPress"
+                                />
+                                <!-- <Button id="idButtonSignUp" text="Sign Up" type="Transparent" press="onSignUp"/> -->
+                            </HBox>
+                        </content>
+                    </Panel>
+                </VBox>
+            </HBox>
+        </Page>
+    </App>
+</mvc:View>
