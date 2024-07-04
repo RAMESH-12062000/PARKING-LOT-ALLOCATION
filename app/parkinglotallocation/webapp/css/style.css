@@ -55,9 +55,39 @@
 }
 
 
-.customHeader{
-    height: 80px;
+.HeaderName{
+    margin: auto;
+    font-size: medium;
+    font-weight: bolder;
 }
+
+
+.AssignClearSpace{
+    margin-right: 0.5rem;
+}
+
+.RadioButtons{
+    margin-right: 2rem; 
+}
+
+.InwardBtn{
+    margin-right: 0.5rem;
+}
+
+/* for status colours */
+.GreenStatus {
+    color: green;
+}
+
+.RedStatus {
+    color: red;
+}
+
+.YellowStatus {
+    color: yellow;
+}
+
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

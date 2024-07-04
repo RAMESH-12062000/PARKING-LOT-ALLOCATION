@@ -1,0 +1,25 @@
+{
+	"selectedKey": "page2",
+	"navigation": [
+		{
+			"expanded": true,
+			"key": "root1"
+		},
+		{
+			"expanded": true,
+			"key": "root2"
+		},
+		{
+			"expanded": true,
+			"key": "root3"
+		},
+		{
+			"expanded": false,
+			"key": "root4"
+		},
+		{
+			"expanded": false,
+			"key": "root5"
+		}
+	]
+}

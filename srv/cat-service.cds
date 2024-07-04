@@ -3,8 +3,11 @@ using my.parkinglot as my from '../db/data-model';
 
 @path: '/ParkingLotAllocationApp'
 service CatalogService {
-    entity users as projection on my.users;
-    entity ParkingSlots as projection on my.ParkingAllSlots;
+    //entity users as projection on my.users;
+    entity AllSlots as projection on my.AllSlots;
+    entity AllocatedSlots as projection on my.AllocatedSlots;
+    entity AvailableSlots as projection on my.AvailableSlots;
+    entity TotalHistory as projection on my.TotalHistory;
     
     //entity Reservations as projection on my.Reservation;
 }
