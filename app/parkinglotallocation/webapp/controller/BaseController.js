@@ -19,6 +19,20 @@ sap.ui.define(
         this.getView().addDependent(oFragment);
         return oFragment
       },
+
+      createData: function (oModel, oPayload, sPath) {
+        return new Promise(function (resolve, reject) {
+          oModel.create(sPath, oPayload, {
+            refreshAfterChange: true,
+            success: function () {
+              resolve();
+            },
+            error: function (oError) {
+              reject(oError);
+            }
+          });
+        });
+      }
     });
   }
 );

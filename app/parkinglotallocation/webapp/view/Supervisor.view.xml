@@ -209,24 +209,26 @@
                                         id="IDGenLabel1"
                                         text="Slot Number"
                                     />
-                                    <ComboBox
+                                    
+                                    <m:Select 
                                         id="slotNumber"
                                         items="{path: '/AvailableSlots'}"
                                         width="80%"
-                                        placeholder="Enter Slot No (or) Select a slot frm the dropdown.."
+                                        selectedKey="{assignmentModel>/slot/slotNumber}"
                                     >
                                         <core:Item
                                             id="IDGenItem1"
-                                            key="{key}"
+                                            key="{availSlot/slotNumber}"
                                             text="{availSlot/slotNumber}"
                                         />
-                                    </ComboBox>
+                                    </m:Select >
                                     <Label
                                         id="IDGenLabel2"
                                         text="Driver Name"
                                     />
                                     <Input
                                         id="driverName"
+                                        value="{assignmentModel>/driverName}"
                                         width="80%"
                                         placeholder="enter Driver name.."
                                     />
@@ -236,6 +238,7 @@
                                     />
                                     <Input
                                         id="driverNumber"
+                                        value="{assignmentModel>/driverNumber}"
                                         width="80%"
                                         placeholder="enter Driver phone number.."
                                     />
@@ -245,6 +248,7 @@
                                     />
                                     <Input
                                         id="vehicleNumber"
+                                        value="{assignmentModel>/vehicleNumber}"
                                         width="80%"
                                         placeholder="enter Vehicle Number.."
                                     />
@@ -255,19 +259,27 @@
                                     <Input
                                         id="vehicleType"
                                         placeholder="enter Vehicle Type.."
+                                        value="{assignmentModel>/vehicleType}"
                                     />
                                     <m:HBox
                                         id="id"
                                         class="RadioButtons"
+                                        
                                     >
                                         <m:RadioButton
                                             id="idradio1"
                                             text="Inward"
                                             class="InwardBtn"
+                                            valueState="Success"
+                                            selected="{= ${assignmentModel>/serviceType} === 'inward'}"
+                                            select=".onServiceTypeChange"
                                         />
                                         <m:RadioButton
                                             id="idradio1234"
                                             text="Outward"
+                                            valueState="Success"
+                                            selected="{= ${assignmentModel>/serviceType} === 'outward'}"
+                                            select="onServiceTypeChange"
                                         />
                                     </m:HBox>
 
@@ -278,13 +290,13 @@
                                         <Button
                                             id="IDGenButton5"
                                             text="Assign"
-                                            press=".onAssignPress"
+                                            press="onAssignSlotPress"
                                             class="AssignClearSpace"
                                         />
                                         <Button
                                             id="IDGenButton6"
                                             text="Clear"
-                                            press=".onClearPress"
+                                            press="onClearPress"
                                         />
                                     </HBox>
                                 </form:content>
@@ -382,7 +394,6 @@
                                                     <Text
                                                         id="IDGenText10"
                                                         text="{status}"
-                                                        class="{parts: [{path: 'slotsModel>status'}], formatter: '.getStatusColor'}"
                                                     />
                                                 </cells>
                                             </ColumnListItem>
@@ -474,6 +485,12 @@
                                                     text="Slot Number:"
                                                 />
                                             </Column>
+                                            <Column id="Allocatedcol7">
+                                                <Text
+                                                    id="IDGenAllocatedText7"
+                                                    text="Vehicle Type:"
+                                                />
+                                            </Column>
                                             <Column id="Allocatedcol2">
                                                 <Text
                                                     id="IDGenAllocatedTextt2"
@@ -492,18 +509,24 @@
                                                     text="Driver Name:"
                                                 />
                                             </Column>
+                                            <Column id="Allocatedcol8">
+                                                <Text
+                                                    id="IDGenAllocatedText8"
+                                                    text="Service Type:"
+                                                />
+                                            </Column>
                                             <Column id="Allocatedcol5">
                                                 <Text
                                                     id="IDGenAllocatedText5"
                                                     text="In Time:"
                                                 />
                                             </Column>
-                                            <Column id="Allocatedcol6">
+                                            <!-- <Column id="Allocatedcol6">
                                                 <Text
                                                     id="IDGenAllocatedText6"
                                                     text="Out Time:"
                                                 />
-                                            </Column>
+                                            </Column> -->
                                         </columns>
                                         <items>
                                             <ColumnListItem
@@ -513,6 +536,10 @@
                                                     <Text
                                                         id="IDGenText01"
                                                         text="{slot/slotNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenText07"
+                                                        text="{vehType}"
                                                     />
                                                     <Text
                                                         id="IDGenText02"
@@ -527,13 +554,17 @@
                                                         text="{driverName}"
                                                     />
                                                     <Text
+                                                        id="IDGenText08"
+                                                        text="{slot/serviceType}"
+                                                    />
+                                                    <Text
                                                         id="IDGenText05"
                                                         text="{inTime}"
                                                     />
-                                                    <Text
+                                                    <!-- <Text
                                                         id="IDGenText06"
                                                         text="{outTime}"
-                                                    />
+                                                    /> -->
                                                 </cells>
                                             </ColumnListItem>
                                         </items>
@@ -684,7 +715,6 @@
                                     <Table
                                         id="idHistoryTable"
                                         width="auto"
-                                        items="{/TotalHistory}"
                                     >
                                         <columns>
                                             <Column id="IDGenColumn0011">
@@ -737,31 +767,31 @@
                                                 <cells>
                                                     <Text
                                                         id="IDGenHistoryText8"
-                                                        text="{allslots123/slotNumber}"
+                                                        text=""
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText9"
-                                                        text="{allslots123/serviceType}"
+                                                        text=""
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText10"
-                                                        text="{allocate/vehNumber}"
+                                                        text=""
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText11"
-                                                        text="{allocate/driverNumber}"
+                                                        text=""
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText12"
-                                                        text="{allocate/driverName}"
+                                                        text=""
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText13"
-                                                        text="{allocate/inTime}"
+                                                        text=""
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText14"
-                                                        text="{allocate/outTime}"
+                                                        text=""
                                                     />
                                                 </cells>
                                             </ColumnListItem>
