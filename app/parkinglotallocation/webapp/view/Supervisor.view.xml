@@ -209,26 +209,24 @@
                                         id="IDGenLabel1"
                                         text="Slot Number"
                                     />
-                                    
-                                    <m:Select 
-                                        id="slotNumber"
-                                        items="{path: '/AvailableSlots'}"
+
+                                    <m:Select
+                                        id="idSelectSlot"
                                         width="80%"
-                                        selectedKey="{assignmentModel>/slot/slotNumber}"
+                                        items="{path: '/AllSlots', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}"
                                     >
                                         <core:Item
-                                            id="IDGenItem1"
-                                            key="{availSlot/slotNumber}"
-                                            text="{availSlot/slotNumber}"
+                                            id="IDGenItem3"
+                                            key="{ID}"
+                                            text="{slotNumber}"
                                         />
-                                    </m:Select >
+                                    </m:Select>
                                     <Label
                                         id="IDGenLabel2"
                                         text="Driver Name"
                                     />
                                     <Input
                                         id="driverName"
-                                        value="{assignmentModel>/driverName}"
                                         width="80%"
                                         placeholder="enter Driver name.."
                                     />
@@ -238,7 +236,6 @@
                                     />
                                     <Input
                                         id="driverNumber"
-                                        value="{assignmentModel>/driverNumber}"
                                         width="80%"
                                         placeholder="enter Driver phone number.."
                                     />
@@ -247,8 +244,7 @@
                                         text="Vehicle Number"
                                     />
                                     <Input
-                                        id="vehicleNumber"
-                                        value="{assignmentModel>/vehicleNumber}"
+                                        id="idvehicleNumber"
                                         width="80%"
                                         placeholder="enter Vehicle Number.."
                                     />
@@ -257,14 +253,30 @@
                                         text="Vehicle Type"
                                     />
                                     <Input
-                                        id="vehicleType"
+                                        id="idvehicleType"
+                                        width="80%"
                                         placeholder="enter Vehicle Type.."
-                                        value="{assignmentModel>/vehicleType}"
                                     />
-                                    <m:HBox
+                                    <Label
+                                        id="IDGenLabel6"
+                                        text="Service Type:"
+                                    />
+                                    <m:Select id="idTypeOfDelivery">
+                                        <core:Item
+                                            id="_IDGenItem234"
+                                            key="InBound"
+                                            text="InBound"
+                                        />
+                                        <core:Item
+                                            id="_IDGenItem2344"
+                                            key="OutBound"
+                                            text="OutBound"
+                                        />
+                                    </m:Select>
+
+                                    <!-- <m:VBox
                                         id="id"
-                                        class="RadioButtons"
-                                        
+                                        class="RadioButtons"  
                                     >
                                         <m:RadioButton
                                             id="idradio1"
@@ -281,7 +293,7 @@
                                             selected="{= ${assignmentModel>/serviceType} === 'outward'}"
                                             select="onServiceTypeChange"
                                         />
-                                    </m:HBox>
+                                    </m:VBox> -->
 
                                     <HBox
                                         id="IDGenHBox2"
@@ -340,6 +352,12 @@
                                         />
                                         <ToolbarSpacer
                                             id="IDGenToolbarSpacer345"
+                                        />
+                                        <m:Button
+                                            id="idBtnAdminLogin"
+                                            tooltip="Add a New Slot"
+                                            icon="sap-icon://add"
+                                            press="onCreateDialogPress"
                                         />
                                     </Toolbar>
                                 </form:toolbar>
@@ -438,6 +456,12 @@
                                             id="TitleAllocated"
                                             text="ASSIGNED SLOTS:"
                                         />
+                                        <m:SearchField
+                                            id="idSearchFieldAllocated"
+                                            liveChange="onLiveSearchAllocatedPress"
+                                            placeholder="Search Anything..."
+                                            width="20%"
+                                        />
                                         <ToolbarSpacer
                                             id="IDGenToolbarSpacerallocated"
                                         />
@@ -521,6 +545,12 @@
                                                     text="In Time:"
                                                 />
                                             </Column>
+                                            <Column id="IDAllocated6">
+                                                <Text
+                                                    id="IDGenAllocatedText6"
+                                                    text="Un Assign:"
+                                                />
+                                            </Column>
                                             <!-- <Column id="Allocatedcol6">
                                                 <Text
                                                     id="IDGenAllocatedText6"
@@ -539,11 +569,11 @@
                                                     />
                                                     <Text
                                                         id="IDGenText07"
-                                                        text="{vehType}"
+                                                        text="{vehicleType}"
                                                     />
                                                     <Text
                                                         id="IDGenText02"
-                                                        text="{vehNumber}"
+                                                        text="{vehicleNumber}"
                                                     />
                                                     <Text
                                                         id="IDGenText03"
@@ -555,16 +585,20 @@
                                                     />
                                                     <Text
                                                         id="IDGenText08"
-                                                        text="{slot/serviceType}"
+                                                        text="{serviceType}"
                                                     />
                                                     <Text
                                                         id="IDGenText05"
                                                         text="{inTime}"
                                                     />
-                                                    <!-- <Text
-                                                        id="IDGenText06"
-                                                        text="{outTime}"
-                                                    /> -->
+                                                    <Button
+                                                        id="idClearUnAssignButton"
+                                                        icon="sap-icon://journey-depart"
+                                                        tooltip="Un Assign"
+                                                        type="Transparent"
+                                                        class="UnAssignBtn"
+                                                        press="onUnAssignPress"
+                                                    />
                                                 </cells>
                                             </ColumnListItem>
                                         </items>
@@ -697,24 +731,25 @@
                                             text="TOATL HISTORY:"
                                         />
                                         <ToolbarSpacer id="IDGenToolbar34589" />
-                                        <m:Input
+                                        <!-- <m:Input
                                             id="idInputSearch"
                                             liveChange="onLiveSearchAnything"
                                             width="30%"
                                             placeholder="Search Anything..."
-                                        />
-                                        <!-- <Button
-                                            id="IDGenSearch"
-                                            icon="sap-icon://search"
-                                            type="Transparent"
-                                            press="onSearchBtnPress"
                                         /> -->
+                                        <m:SearchField
+                                            id="idSearchField"
+                                            liveChange="onLiveSearchAnythingPress"
+                                            placeholder="Search Anything..."
+                                            width="30%"
+                                        />
                                     </Toolbar>
                                 </form:toolbar>
                                 <form:content>
                                     <Table
                                         id="idHistoryTable"
                                         width="auto"
+                                        items="{/TotalHistory}"
                                     >
                                         <columns>
                                             <Column id="IDGenColumn0011">
@@ -727,6 +762,12 @@
                                                 <Text
                                                     id="IDGenText0022"
                                                     text="Service Type:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn0088">
+                                                <Text
+                                                    id="IDGenText0088"
+                                                    text="Vehicle Type:"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0033">
@@ -767,32 +808,43 @@
                                                 <cells>
                                                     <Text
                                                         id="IDGenHistoryText8"
-                                                        text=""
+                                                        text="{allocate/slot/slotNumber}"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText9"
-                                                        text=""
+                                                        text="{allocate/serviceType}"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText10"
-                                                        text=""
+                                                        text="{allocate/vehicleType}"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText11"
-                                                        text=""
+                                                        text="{allocate/vehicleNumber}"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText12"
-                                                        text=""
+                                                        text="{allocate/driverNumber}"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText13"
-                                                        text=""
+                                                        text="{allocate/driverName}"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText14"
-                                                        text=""
+                                                        text="{allocate/inTime}"
                                                     />
+                                                    <Text
+                                                        id="IDGenHistoryText15"
+                                                        text="{outTime}"
+                                                    />
+                                                    <!-- <Button
+                                                        id="idClearSlotButton"
+                                                        icon="sap-icon://delete"
+                                                        tooltip="Un Assign"
+                                                        type="Transparent"
+                                                        press="onClearUnAssignPress"
+                                                    /> -->
                                                 </cells>
                                             </ColumnListItem>
                                         </items>

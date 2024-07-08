@@ -66,25 +66,17 @@
     margin-right: 0.5rem;
 }
 
-.RadioButtons{
+/* .RadioButtons{
     margin-right: 2rem; 
 }
 
 .InwardBtn{
     margin-right: 0.5rem;
-}
+} */
 
-/* for status colours */
-.GreenStatus {
-    color: green;
-}
-
-.RedStatus {
-    color: red;
-}
-
-.YellowStatus {
-    color: yellow;
+.UnAssignBtn{
+    margin: auto;
+    margin-left:  1rem;
 }
 
 

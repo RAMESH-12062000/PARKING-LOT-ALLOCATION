@@ -22,25 +22,32 @@ sap.ui.define([
           contact: "rameshp9000@gmail.com.com",
           phone: "+91 9000727831"
         };
+
         //Create a JSON model and set the data
         var oSupervisorModel = new JSONModel(oSupervisorData);
         this.getView().setModel(oSupervisorModel, "supervisor");
 
-
-        //Assign a slot to vehicle first create model...
-        var oAssignmentData = {
-          slot: {
-            slotNumber:""
-          },
-          driverName: "",
-          driverNumber: "",
-          vehicleNumber: "",
-          vehicleType: "",
-          serviceType: "",
-          inTime:""
-        };
-        var oAssignmentModel = new JSONModel(oAssignmentData);
-        this.getView().setModel(oAssignmentModel, "assignmentModel");
+        // //Assign a slot to vehicle first create model...
+        // var oAssignmentData = {
+        //   slot: {
+        //     slotNumber: sSlotNumber
+        //   },
+        //   driverName: "",
+        //   driverNumber: "",
+        //   vehicleNumber:"",
+        //   vehicleType: "",
+        //   serviceType: "",
+        //   inTime: ""
+        // };
+        // var sSlotNumber = this.byId("idslotNumber").getSelectedKey();
+        // var sServiceType = this.byId("idTypeOfDelivery").getSelectedKey();
+        // var sDriverName = this.byId("driverName").getSelectedKey();
+        // var sDriverNumber = this.byId("driverNumber").getSelectedKey();
+        // var sVehicleNumber = this.byId("idTypeOfDelivery").getSelectedKey();
+        // var sVehicleType = this.byId("idTypeOfDelivery").getSelectedKey();
+        // var sServiceType = this.byId("idTypeOfDelivery").getSelectedKey();
+        // var oAssignmentModel = new JSONModel(oAssignmentData);
+        // this.getView().setModel(oAssignmentModel, "assignmentModel");
       },
 
       onItemSelect: function (oEvent) {
@@ -107,22 +114,44 @@ sap.ui.define([
       },
 
       //I have used radiobuttons for inward and outward so need to get the data of you selected button, this below required...
-      onServiceTypeChange: function (oEvent) {
-        var sSelectedText = oEvent.getSource().getText().toLowerCase();
-        this.getView().getModel("assignmentModel").setProperty("/serviceType", sSelectedText);
-      },
+      // onServiceTypeChange: function (oEvent) {
+      //   var sSelectedText = oEvent.getSource().getText().toLowerCase();
+      //   this.getView().getModel("assignmentModel").setProperty("/serviceType", sSelectedText);
+      // },
 
 
       //Assign a Slot to Vehicle...
       onAssignSlotPress: async function () {
         debugger
-        const oAssignmentModel = this.getView().getModel("assignmentModel");
-        const oPayload = oAssignmentModel.getProperty("/"),
-          oModel = this.getView().getModel("ModelV2");
-        oPayload.inTime = new Date().toLocaleString();
-        console.log("Payload: ", oPayload);
+        var sSlotNumber = this.getView().byId("idSelectSlot").getSelectedKey();
+        var sVehicleNumber = this.getView().byId("idvehicleNumber").getValue();
+        var sVehicleType = this.getView().byId("idvehicleType").getValue();
+        var sDriverNumber = this.getView().byId("driverNumber").getValue();
+        var sDriverName = this.getView().byId("driverName").getValue();
+        var sServiceType = this.getView().byId("idTypeOfDelivery").getSelectedKey();
 
-        
+
+        const assignmentModel = new sap.ui.model.json.JSONModel({
+          vehicleType: sDriverName,
+          vehicleNumber: sVehicleNumber,
+          vehicleType: sVehicleType,
+          driverNumber: sDriverNumber,
+          serviceType: sServiceType,
+          driverName: sDriverName,
+          inTime: new Date(),
+          slot_ID: sSlotNumber
+        })
+        this.getView().setModel(assignmentModel, "assignmentModel");
+        const oPayload = this.getView().getModel("assignmentModel").getProperty("/");
+        //const oPayload = oAssignmentModel.getProperty("/"),
+        const oModel = this.getView().getModel("ModelV2");
+
+        //for currents date and time...
+        const now = new Date();
+        const formattedDateTime = now.toISOString(); // This will give you the required format
+        oPayload.inTime = formattedDateTime;
+
+        console.log("Payload: ", oPayload);
 
         try {
           await this.createData(oModel, oPayload, "/AllocatedSlots");
@@ -148,30 +177,106 @@ sap.ui.define([
 
 
 
-      
+      // onUnAssignPress: function (oEvent) {
+      //   const oItem = oEvent.getSource().getParent();
+      //   const oContext = oItem.getBindingContext();
+      //   const sPath = oContext.getPath();
+      //   const oModel = this.getView().getModel("ModelV2");
+      //   const oAllocatedData = oContext.getObject();
+      //   const oThis = this;
+
+      //   MessageBox.confirm(
+      //     `Are you sure you want to unassign slot '${oAllocatedData.slot.slotNumber}'?`,
+      //     {
+      //       actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+      //       onClose: function (sAction) {
+      //         if (sAction === MessageBox.Action.YES) {
+      //           debugger
+      //           // Remove the entry from AllocatedSlots
+      //           oModel.remove(sPath, {
+      //             success: function () {
+      //               // Add entry to History table
+      //               let oHistoryModel = oThis.getView().getModel("HistoryModel");
+      //               let oHistoryData = oHistoryModel.getData();
+      //               oAllocatedData.outTime = new Date().toISOString();
+      //               oHistoryData.TotalHistory.push(oAllocatedData);
+      //               oHistoryModel.setData(oHistoryData);
+
+      //               // Update the AllSlots status to Available
+      //               let oAllSlotsModel = oThis.getView().getModel("AllSlotsModel");
+      //               let aAllSlots = oAllSlotsModel.getData().AllSlots;
+      //               let oSlot = aAllSlots.find(slot => slot.slotNumber === oAllocatedData.slot.slotNumber);
+      //               if (oSlot) {
+      //                 oSlot.status = "Available";
+      //                 oAllSlotsModel.setData({ AllSlots: aAllSlots });
+      //               }
+
+      //               MessageBox.success(`Slot '${oAllocatedData.slot.slotNumber}' unassigned successfully.`);
+      //               oThis.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
+      //               oThis.getView().byId("idHistoryTable").getBinding("items").refresh();
+      //               oThis.getView().byId("allSlotsTable").getBinding("items").refresh();
+      //             },
+      //             error: function () {
+      //               MessageBox.error(`Failed to unassign slot '${oAllocatedData.slot.slotNumber}'.`);
+      //             }
+      //           });
+      //         }
+      //       }
+      //     }
+      //   );
+      // },
 
 
 
-      //Search anything from History...
-      onLiveSearchAnything: function (oEvent) {
+
+
+
+
+      //Search anything from AllocatedSlots Table...(this way also works fine)
+      onLiveSearchAllocatedPress: function (oEvent) {
         var sQuery = oEvent.getSource().getValue();
         var aFilters = [];
 
         if (sQuery && sQuery.length > 0) {
-          var filterSlotNumber = new Filter("allslots123/slotNumber", FilterOperator.Contains, sQuery);
-          var filtervehNumber = new Filter("allocate/vehNumber", FilterOperator.Contains, sQuery);
-          var filterdriverNumber = new Filter("allocate/driverNumber", FilterOperator.Contains, sQuery);
-          var filterdriverName = new Filter("allocate/driverName", FilterOperator.Contains, sQuery);
+          var filterSlotNumber = new Filter("slot/slotNumber", FilterOperator.Contains, sQuery);
+          var filtervehType = new Filter("vehicleType", FilterOperator.Contains, sQuery);
+          var filtervehNumber = new Filter("vehicleNumber", FilterOperator.Contains, sQuery);
+          var filterdriverNumber = new Filter("driverNumber", FilterOperator.Contains, sQuery);
+          var filterdriverName = new Filter("driverName", FilterOperator.Contains, sQuery);
 
           var allFilter = new Filter({
-            filters: [filterSlotNumber, filtervehNumber, filterdriverNumber, filterdriverName],
+            filters: [filterSlotNumber, filtervehType, filtervehNumber, filterdriverNumber, filterdriverName],
             and: false
           });
+          aFilters.push(allFilter);
 
-          var oList = this.byId("idHistoryTable");
+          var oList = this.byId("AllocatedSlotsTable");
           var oBinding = oList.getBinding("items");
           oBinding.filter(allFilter);
         }
-      }
+      },
+
+      //Search anything from History Table...
+      onLiveSearchAnythingPress: function (oEvent) {
+        var sQuery = oEvent.getParameter("newValue");
+        var aFilters = [];
+
+        if (sQuery && sQuery.length > 0) {
+          aFilters.push(new Filter("allocate/slot/slotNumber", FilterOperator.Contains, sQuery));
+          aFilters.push(new Filter("allocate/vehicleType", FilterOperator.Contains, sQuery));
+          aFilters.push(new Filter("allocate/vehicleNumber", FilterOperator.Contains, sQuery));
+          aFilters.push(new Filter("allocate/driverNumber", FilterOperator.Contains, sQuery));
+          aFilters.push(new Filter("allocate/driverName", FilterOperator.Contains, sQuery));
+
+          var oFinalFilter = new Filter({
+            filters: aFilters,
+            and: false
+          });
+
+          this.getView().byId("idHistoryTable").getBinding("items").filter(oFinalFilter);
+        } else {
+          this.getView().byId("idHistoryTable").getBinding("items").filter([]);
+        }
+      },
     });
   });
