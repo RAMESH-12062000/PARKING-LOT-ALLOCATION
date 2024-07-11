@@ -23,17 +23,23 @@ entity AllocatedSlots {
         driverName    : String;
         serviceType   : String;
         inTime        : DateTime;
-        slot          : Association to one AllSlots;
+        slotNum       : Association to one AllSlots;
 }
 
-entity AvailableSlots {
-    key ID        : UUID;
-        availSlot : Association to one AllSlots;
-}
+// entity AvailableSlots {
+//     key ID        : UUID;
+//         availSlot : Association to one AllSlots;
+// }
 
 entity TotalHistory {
-    key ID       : UUID;
-        outTime  : DateTime;
-        allocate : Association to one AllocatedSlots;
+    key ID            : UUID;
+        slotNumber    : String;
+        vehicleType   : String;
+        vehicleNumber : String;
+        driverNumber  : String;
+        driverName    : String;
+        serviceType   : String;
+        inTime        : DateTime;
+        outTime       : DateTime;
 //allslots123 : Association to one AllSlots;
 }
