@@ -126,8 +126,14 @@
                         icon="sap-icon://cart-2"
                     />
                     <tnt:NavigationListItem
-                        id="idGenHistory"
+                        id="idGenReservedSlot"
                         key="root5"
+                        text="Reserved Slots:"
+                        icon="sap-icon://bus-public-transport"
+                    />
+                    <tnt:NavigationListItem
+                        id="idGenHistory"
+                        key="root6"
                         text="History:"
                         icon="sap-icon://customer-history"
                     />
@@ -152,7 +158,7 @@
                         horizontal="false"
                         vertical="true"
                         height="100%"
-                        class="sapUiContentPadding"
+                        class="sapUiContentPadding1234"
                     >
                         <VBox
                             id="IDGenVBox2"
@@ -601,7 +607,7 @@
                         </m:VBox>
                     </ScrollContainer>
 
-                    <!-- RightSide Pannel 4th Available Slots... -->
+                    <!-- RightSide Pannel 4th Reservations Table... -->
                     <ScrollContainer
                         id="root4"
                         horizontal="false"
@@ -636,6 +642,12 @@
                                             text="RESERVATIONS:"
                                         />
                                         <ToolbarSpacer id="IDGenToolbar345" />
+                                        <m:Button
+                                            id="idBtnRequest"
+                                            text="Confirm"
+                                            press="onRequestConfirmSlotPress"
+                                            type="Transparent"
+                                        />
                                     </Toolbar>
                                 </form:toolbar>
                                 <form:content>
@@ -645,24 +657,50 @@
                                     >
                                         <Title
                                             id="Title5"
-                                            text="Reserved Slots By Vendors:"
+                                            text="Request for a Slot from Vendors:"
                                         />
                                     </Toolbar>
                                     <Table
-                                        id="AvailSlotsTable"
+                                        id="idReservationsTable"
                                         width="auto"
+                                        mode="SingleSelectLeft"
+                                        items="{/Reservations}"
                                     >
                                         <columns>
                                             <Column id="IDGenColumn001">
                                                 <Text
                                                     id="IDGenText001"
-                                                    text="Slot Number:"
+                                                    text="Vendor Name:"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn002">
                                                 <Text
                                                     id="IDGenText002"
-                                                    text="Service Type:"
+                                                    text="Vendor Number:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn003">
+                                                <Text
+                                                    id="IDGenText003"
+                                                    text="Driver Name:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn004">
+                                                <Text
+                                                    id="IDGenText004"
+                                                    text="Driver Number:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn005">
+                                                <Text
+                                                    id="IDGenText005"
+                                                    text="Vehicle Type:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn006">
+                                                <Text
+                                                    id="IDGenText006"
+                                                    text="Vehicle Number:"
                                                 />
                                             </Column>
                                         </columns>
@@ -672,12 +710,28 @@
                                             >
                                                 <cells>
                                                     <Text
-                                                        id="IDGenAvailText8"
-                                                        text="{availSlot/slotNumber}"
+                                                        id="IDGenAvailText1"
+                                                        text="{vendorName}"
                                                     />
                                                     <Text
-                                                        id="IDGenAvailText9"
-                                                        text="{availSlot/serviceType}"
+                                                        id="IDGenAvailText2"
+                                                        text="{vendorNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenAvailText3"
+                                                        text="{driverName}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenAvailText4"
+                                                        text="{driverNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenAvailText5"
+                                                        text="{vehicleType}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenAvailText6"
+                                                        text="{vehicleNumber}"
                                                     />
                                                 </cells>
                                             </ColumnListItem>
@@ -688,9 +742,148 @@
                         </m:VBox>
                     </ScrollContainer>
 
-                    <!-- RightSide Pannel 5th History... -->
-                    <m:ScrollContainer
+                    <!-- Reserved Slots for a Vendor....5th -->
+                    <ScrollContainer
                         id="root5"
+                        horizontal="false"
+                        vertical="true"
+                        height="100%"
+                        class="sapUiContentPadding"
+                    >
+                        <m:VBox id="idVBoxReserveslots">
+                            <form:SimpleForm
+                                id="idfifthSimpleFormToolbar"
+                                editable="true"
+                                layout="ResponsiveGridLayout"
+                                labelSpanXL="4"
+                                labelSpanL="3"
+                                labelSpanM="4"
+                                labelSpanS="12"
+                                adjustLabelSpan="false"
+                                emptySpanXL="0"
+                                emptySpanL="4"
+                                emptySpanM="0"
+                                emptySpanS="0"
+                                columnsXL="2"
+                                columnsL="1"
+                                columnsM="1"
+                                singleContainerFullSize="false"
+                                ariaLabelledBy="Title1"
+                            >
+                                <form:toolbar>
+                                    <Toolbar id="TB5">
+                                        <Title
+                                            id="Title1489045"
+                                            text="RESERVED SLOTS FROM VENDORS:"
+                                        />
+                                        <ToolbarSpacer id="IDGenToolbar567" />
+                                    </Toolbar>
+                                </form:toolbar>
+                                <form:content>
+                                    <Toolbar
+                                        id="IDGenToolbar90"
+                                        ariaLabelledBy="Title2"
+                                    >
+                                        <Title
+                                            id="Title2345"
+                                            text="You declared a Slot for Vendor:"
+                                        />
+                                    </Toolbar>
+                                    <Table
+                                        id="idReservedslotsTable"
+                                        width="auto"
+                                        mode="MultiSelect"
+                                        items="{/ReservedSlots}"
+                                    >
+                                        <columns>
+                                            <Column id="IDGenColumn9000">
+                                                <Text
+                                                    id="IDGenText91"
+                                                    text="Vendor Name:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9001">
+                                                <Text
+                                                    id="IDGenText92"
+                                                    text="Vendor Number:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9002">
+                                                <Text
+                                                    id="IDGenText93"
+                                                    text="Driver Name:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9003">
+                                                <Text
+                                                    id="IDGenText94"
+                                                    text="Driver Number:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9004">
+                                                <Text
+                                                    id="IDGenText95"
+                                                    text="Reserved Slot:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9005">
+                                                <Text
+                                                    id="IDGenText96"
+                                                    text="Vehicle Type:"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9006">
+                                                <Text
+                                                    id="IDGenText97"
+                                                    text="Vehicle Number:"
+                                                />
+                                            </Column>
+                                        </columns>
+                                        <items>
+                                            <ColumnListItem
+                                                id="IDGenReserveColListItem1"
+                                            >
+                                                <cells>
+                                                    <Text
+                                                        id="IDGenReserveText1"
+                                                        text="{vendorName}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText2"
+                                                        text="{vendorNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText3"
+                                                        text="{driverName}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText4"
+                                                        text="{driverNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText5"
+                                                        text="{reserveSlot/slotNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText6"
+                                                        text="{vehicleType}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText7"
+                                                        text="{vehicleNumber}"
+                                                    />
+                                                </cells>
+                                            </ColumnListItem>
+                                        </items>
+                                    </Table>
+                                </form:content>
+                            </form:SimpleForm>
+                        </m:VBox>
+                    </ScrollContainer>
+
+                    <!-- RightSide Pannel 6th History... -->
+                    <m:ScrollContainer
+                        id="root6"
                         horizontal="false"
                         vertical="true"
                         height="100%"
@@ -717,7 +910,7 @@
                                 ariaLabelledBy="Title1"
                             >
                                 <form:toolbar>
-                                    <Toolbar id="TB5">
+                                    <Toolbar id="TB6">
                                         <Title
                                             id="Title145589676"
                                             text="TOATL HISTORY:"
@@ -854,7 +1047,7 @@
                     >
                         <m:Image
                             id="IdImageright"
-                            src="./Images/image2.jpeg"
+                            src="./Images/image(5).jpeg"
                             width="100%"
                             height="auto"
                         />

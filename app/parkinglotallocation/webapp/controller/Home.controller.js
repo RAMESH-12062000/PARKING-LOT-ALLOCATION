@@ -26,6 +26,11 @@ sap.ui.define([
                 //Create a JSON model and set the data
                 var oSupervisorModel = new JSONModel(oSupervisorData);
                 this.getView().setModel(oSupervisorModel, "supervisor");
+
+                var oReservedSlotsModel = new JSONModel({
+                    ReservedSlots: []
+                });
+                this.getView().setModel(oReservedSlotsModel, "reservedSlotsModel");
             },
 
             //For settings button in Slot Assignment...
@@ -98,13 +103,6 @@ sap.ui.define([
                     oToggleButton.setTooltip('Small Size Navigation');
                 }
             },
-
-            //I have used radiobuttons for inward and outward so need to get the data of you selected button, this below required...
-            // onServiceTypeChange: function (oEvent) {
-            //   var sSelectedText = oEvent.getSource().getText().toLowerCase();
-            //   this.getView().getModel("assignmentModel").setProperty("/serviceType", sSelectedText);
-            // },
-
 
             //Assign a slot to vehicle...
             onAssignSlotPress: async function () {
@@ -229,196 +227,8 @@ sap.ui.define([
                 }
             },
 
-
-
-            //Assign a Slot to Vehicle...
-
-            // onAssignSlotPress: async function () {
-            //   const oUserView = this.getView();
-
-            //   var sSlotNumber = this.byId("idparkingLotSelect").getSelectedKey();
-            //   var sVehicleNumber = this.byId("idvehicleNumber").getValue();
-            //   var sDriverName = this.byId("iddriverName").getValue();
-            //   var sDriverNumber = this.byId("iddriverNumber").getValue();
-            //   var sVehicleType = this.byId("idvehicleType").getValue();
-            //   var sServiceType = this.byId("idTypeOfDelivery").getSelectedKey();
-
-            //   const assignmentModel = new sap.ui.model.json.JSONModel({
-            //     driverName: sDriverName,
-            //     driverNumber: sDriverNumber,
-            //     vehicleNumber: sVehicleNumber,
-            //     vehicleType: sVehicleType,
-            //     serviceType: sServiceType,
-            //     inTime: new Date(),
-            //     slot: {
-            //       slotNumber: sSlotNumber
-            //     }
-            //   });
-
-            //   var bValid = true;
-
-            //   // Driver Name Validation
-            //   if (!sDriverName || sDriverName.length < 4) {
-            //     oUserView.byId("iddriverName").setValueState("Error");
-            //     oUserView.byId("iddriverName").setValueStateText("Name Must Contain at least 4 Characters");
-            //     bValid = false;
-            //   } else {
-            //     oUserView.byId("iddriverName").setValueState("None");
-            //   }
-
-            //   // Driver Number Validation
-            //   if (!sDriverNumber || sDriverNumber.length !== 10 || !/^\d+$/.test(sDriverNumber)) {
-            //     oUserView.byId("iddriverNumber").setValueState("Error");
-            //     oUserView.byId("iddriverNumber").setValueStateText("Driver number must be a 10-digit numeric value");
-            //     bValid = false;
-            //   } else {
-            //     oUserView.byId("iddriverNumber").setValueState("None");
-            //   }
-
-            //   // Vehicle Number Validation
-            //   if (!sVehicleNumber || !/^[A-Za-z]{2}\d{2}[A-Za-z]{2}\d{4}$/.test(sVehicleNumber)) {
-            //     oUserView.byId("idvehicleNumber").setValueState("Error");
-            //     oUserView.byId("idvehicleNumber").setValueStateText("Vehicle number should follow this pattern AP12BG1234");
-            //     bValid = false;
-            //   } else {
-            //     oUserView.byId("idvehicleNumber").setValueState("None");
-            //   }
-
-            //   // Vehicle Type Validation
-            //   if (!sVehicleType) {
-            //     oUserView.byId("idvehicleType").setValueState("Error");
-            //     bValid = false;
-            //   } else {
-            //     oUserView.byId("idvehicleType").setValueState("None");
-            //   }
-
-            //   // Service Type Validation
-            //   if (!sServiceType) {
-            //     oUserView.byId("idTypeOfDelivery").setValueState("Error");
-            //     bValid = false;
-            //   } else {
-            //     oUserView.byId("idTypeOfDelivery").setValueState("None");
-            //   }
-
-            //   // Slot Number Validation
-            //   if (!sSlotNumber) {
-            //     oUserView.byId("idparkingLotSelect").setValueState("Error");
-            //     bValid = false;
-            //   } else {
-            //     oUserView.byId("idparkingLotSelect").setValueState("None");
-            //   }
-
-            //   if (!bValid) {
-            //     MessageToast.show("Please enter correct data");
-            //     return;
-            //   } else {
-            //     this.getView().setModel(assignmentModel, "assignmentModel");
-            //     const oPayload = this.getView().getModel("assignmentModel").getProperty("/");
-            //     const oModel = this.getView().getModel("ModelV2");
-
-            //     try {
-            //       // Create the assignment in AllocatedSlots
-            //       await this.createData(oModel, oPayload, "/AllocatedSlots");
-
-            //       // Update the status of the selected slot in AllSlots to "Occupied"
-            //       var sUpdatePath = `/AllSlots('${sSlotNumber}')`;
-            //       var oUpdatePayload = {
-            //         status: "Occupied"
-            //       };
-            //       await this.updateData(oModel, sUpdatePath, oUpdatePayload);
-
-            //       this.getView().byId("idSlotsTable").getBinding("items").refresh();
-            //       this.oAssignedslotDialog.close();
-            //       MessageToast.show("Slot assigned successfully");
-            //     } catch (error) {
-            //       console.error("Error: ", error);
-            //       MessageBox.error("Some technical issue");
-            //     }
-            //   }
-            // },
-
-
-
-            //For Un Assign a Slot and it Will trigger at History Table...
-            // onUnAssignPress: async function (oEvent) {
-            //     debugger
-            //     const oItem = oEvent.getSource().getParent();
-            //     const oContext = oItem.getBindingContext();
-            //     const sPath = oContext.getPath();
-            //     const oModel = this.getView().getModel("ModelV2");
-            //     const oAllocatedData = oContext.getObject();
-            //     const oThis = this;
-
-            //     MessageBox.confirm(
-            //         `Are you sure you want to unassign slot '${oAllocatedData.slot_ID}'?`,
-            //         {
-            //             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            //             onClose: async function (sAction) {
-            //                 if (sAction === MessageBox.Action.YES) {
-            //                     try {
-            //                         // Remove the entry from AllocatedSlots
-            //                         await oModel.remove(sPath);
-            //                         MessageBox.success(`Slot unassigned successfully, Pls chechk once in History..!`);
-            //                         debugger
-
-            //                         // Add entry to History table
-            //                         const oHistoryPayload = {
-            //                             vehicleType: oAllocatedData.vehicleType,
-            //                             vehicleNumber: oAllocatedData.vehicleNumber,
-            //                             driverNumber: oAllocatedData.driverNumber,
-            //                             driverName: oAllocatedData.driverName,
-            //                             serviceType: oAllocatedData.serviceType,
-            //                             inTime: oAllocatedData.inTime,
-            //                             outTime: new Date().toISOString(),
-            //                             slotNumber: oAllocatedData.slot.slotNumber
-            //                         };
-
-            //                         console.log("Payload: ", oHistoryPayload);
-
-            //                         await new Promise((resolve, reject) => {
-            //                             oModel.create("/TotalHistory", oHistoryPayload, {
-            //                                 success: resolve,
-            //                                 error: reject
-            //                             });
-            //                         });
-            //                         oThis.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
-
-
-            //                         // const sSlotPath = `/AllSlots('${oAllocatedData.slot.slotNumber}')`;
-            //                         // debugger
-            //                         // oModel.read(sSlotPath, {
-            //                         //     success: function (oData) {
-            //                         //         oData.status = "Available";
-            //                         //         oModel.update(sSlotPath, oData, {
-            //                         //             success: function () {
-            //                         //                 oModel.refresh(); // Refresh the model to get the latest data
-            //                         //                 MessageToast.show("Slot status updated to 'Available'.");
-            //                         //             },
-            //                         //             error: function (oError) {
-            //                         //                 MessageBox.error("Failed to update slot status: " + oError.message);
-            //                         //             }
-            //                         //         });
-            //                         //     },
-            //                         //     error: function (oError) {
-            //                         //         MessageBox.error("Failed to fetch slot data: " + oError.message);
-            //                         //     }
-            //                         // });
-
-
-            //                         // Refresh the tables
-            //                         oThis.getView().byId("idHistoryTable").getBinding("items").refresh();
-            //                         oThis.getView().byId("allSlotsTable").getBinding("items").refresh();
-            //                     } catch (error) {
-            //                         MessageBox.error("Failed to unassign slot or add to history.");
-            //                         console.error("Error: ", error);
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     );
-            // },
-
-            onRefreshBtnPress:function(){
+            //Refresh Btn in AllSlots Table
+            onRefreshBtnPress: function () {
                 this.getView().byId("allSlotsTable").getBinding("items").refresh();
             },
 
@@ -540,5 +350,123 @@ sap.ui.define([
                     this.getView().byId("idHistoryTable").getBinding("items").filter([]);
                 }
             },
+
+            //=============================================================>For Vendor View operations...!!
+            onRequestConfirmSlotPress: async function () {
+                var oSelected = this.byId("idReservationsTable").getSelectedItem();
+                if (oSelected) {
+                    debugger
+                    var oID = oSelected.getBindingContext().getObject().ID
+                    var oVendorName = oSelected.getBindingContext().getObject().vendorName
+                    var oVendorNumber = oSelected.getBindingContext().getObject().vendorNumber
+                    var oDriverName = oSelected.getBindingContext().getObject().driverName
+                    var oDriverNumber = oSelected.getBindingContext().getObject().driverName
+                    var oVehicleType = oSelected.getBindingContext().getObject().vehicleType
+                    var oVehicleNumebr = oSelected.getBindingContext().getObject().vehicleNumber
+
+                    const oConfirmRequestModel = new JSONModel({
+                        ID: oID,
+                        vendorName: oVendorName,
+                        vendorNumber: oVendorNumber,
+                        driverName: oDriverName,
+                        driverNumber: oDriverNumber,
+                        vehicleType: oVehicleType,
+                        vehicleNumber: oVehicleNumebr
+                    });
+                    this.getView().setModel(oConfirmRequestModel, "oConfirmRequestModel");
+                    if (!this.onRequestConfirmSlotDialog) {
+                        this.onRequestConfirmSlotDialog = await this.loadFragment("ReserveSlot")
+                    }
+                    this.onRequestConfirmSlotDialog.open();
+                } else {
+                    MessageToast.show("Please Select a Vendor to Confirm A Slot..!")
+                }
+            },
+
+            //After recieving a request from vendor then the Admin will Accept that request and reserve a slot for him...
+            onReserveSlotBtnPress: async function () {
+                try {
+                    var oConfirmRequestModel = this.getView().getModel("oConfirmRequestModel").getData();
+                    var oSelectedSlot = this.byId("idselectSlotReserve").getSelectedItem();
+
+                    var oSlotContext = oSelectedSlot.getBindingContext().getObject();
+                    var oModel = this.getView().getModel("ModelV2");
+                    const oThis = this
+
+                    debugger
+                    oModel.update("/AllSlots(" + oSlotContext.ID + ")", { status: 'Reserved' }, {
+                        success: function () {
+                            sap.m.MessageToast.show("Slot Status Updated to Reserved..!!");
+                        }, error: function (oError) {
+                            sap.m.MessageBox.error(oError);
+                        }
+                    })
+
+                    // Create new entry in Reserved Slots table
+                    var oReservedSlotEntry = {
+                        vendorName: oConfirmRequestModel.vendorName,
+                        vendorNumber: oConfirmRequestModel.vendorNumber,
+                        driverName: oConfirmRequestModel.driverName,
+                        driverNumber: oConfirmRequestModel.driverNumber,
+                        vehicleType: oConfirmRequestModel.vehicleType,
+                        vehicleNumber: oConfirmRequestModel.vehicleNumber,
+                        reserveSlot: {
+                            ID: oSlotContext.ID,
+                            slotNumber: oSlotContext.slotNumber
+                        }
+                    };
+
+                    // Add the reserved slot entry
+                    debugger
+                    await new Promise((resolve, reject) => {
+                        oModel.create("/ReservedSlots", oReservedSlotEntry, {
+                            success: () => {
+                                sap.m.MessageToast.show("Slot reserved successfully!");
+                                this.getView().byId("idReservedslotsTable").getBinding("items").refresh();
+                                resolve();
+                            },
+                            error: (oError) => {
+                                sap.m.MessageBox.error(oError.message);
+                                reject(oError);
+                            }
+                        });
+                    });
+
+                    //Remove That request after confirm or reject
+                    var oSelectedItem = this.byId("idReservationsTable").getSelectedItem();
+                    if (oSelectedItem) {
+                        var sPath = oSelectedItem.getBindingContext().getPath();
+
+                        // Remove the request from Reservations table
+                        await new Promise((resolve, reject) => {
+                            oModel.remove(sPath, {
+                                success: () => {
+                                    sap.m.MessageToast.show("Request removed successfully.");
+                                    oThis.getView().byId("idReservationsTable").getBinding("items").refresh();
+                                    resolve();
+                                },
+                                error: (oError) => {
+                                    sap.m.MessageBox.error(oError.message);
+                                    reject(oError);
+                                }
+                            });
+                        });
+                    } else {
+                        sap.m.MessageToast.show("No selected request to remove.");
+                    }
+
+                    // Show success message
+                    sap.m.MessageToast.show("Slot reserved successfully!");
+
+                    // Close the dialog if needed
+                    if (this.onRequestConfirmSlotDialog) {
+                        this.onRequestConfirmSlotDialog.close();
+                    }
+                } catch (error) {
+                    sap.m.MessageBox.error("Failed to reserve slot: " + error.message);
+                    console.error("Error: ", error);
+                }
+            }
+
         });
     });

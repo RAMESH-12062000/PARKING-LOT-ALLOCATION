@@ -1,0 +1,162 @@
+<mvc:View
+    controllerName="com.app.vendorpage.controller.Vendor"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+>
+    <App id="idApp">
+        <Page
+            id="idPage"
+            showHeader="false"
+            class="HomePageBackground"
+        >
+            <VBox id="idVBox1">
+                <HBox
+                    id="idHbox1"
+                    class="header"
+                >
+                    <Button
+                        id="idbtn123"
+                        text="Book a Slot"
+                        type="Transparent"
+                        class="navButton1"
+                        press="onBookSlotPress"
+                    />
+                    <Button
+                        id="idqw"
+                        text="Notifications"
+                        type="Transparent"
+                        icon="sap-icon://bell"
+                        class="navButton"
+                    />
+                </HBox>
+                <HBox
+                    id="idHBoxMain"
+                    class="mainContainer"
+                    justifyContent="Center"
+                    alignItems="Center"
+                >
+                    <VBox
+                        id="idVBoxDescription"
+                        class="descriptionContainer"
+                    >
+                        <Title
+                            id="idTextDescriptionTitle"
+                            text="Parking Lot Allocation Powered by Artihcus..!!"
+                            class="TextParkingLot"
+                        />
+                        <Text
+                            id="idTextDescription"
+                            text="#Welcome to Parking Lot Allocation..!"
+                            class="ParkingSubtitle"
+                        />
+                    </VBox>
+                    <VBox
+                        id="idVBoxLoginContainer"
+                        class="loginContainer hidden"
+                        justifyContent="Center"
+                        alignItems="Center"
+                    >
+                        <Title
+                            id="idTextParking"
+                            text="BOOK A SLOT"
+                            level="H2"
+                        />
+                        <Panel
+                            id="idPanelParking"
+                            class="sapUiResponsiveMargin"
+                            width="auto"
+                        >
+                            <content>
+                                <Label
+                                    id="idLabelVendorname"
+                                    text="Vendor Name:"
+                                    labelFor="vendornameInput"
+                                    required="true"
+                                />
+                                <Input
+                                    id="idVendornameInput"
+                                    placeholder="Enter your Username.."
+                                />
+                                <Label
+                                    id="idLabelmobile"
+                                    text="Vendor Phonenumber:"
+                                    labelFor="passwordInput"
+                                    class="sapUiSmallMarginTop"
+                                    required="true"
+                                />
+                                <Input
+                                    id="idVendorNumberInput"
+                                    placeholder="Enter your Phonenumber..."
+                                />
+                                <Label
+                                    id="idLabeldriver"
+                                    text="Driver Name:"
+                                    labelFor="passwordInput"
+                                    class="sapUiSmallMarginTop"
+                                    required="true"
+                                />
+                                <Input
+                                    id="idDrivernameInput"
+                                    placeholder="Enter your Driver Name..."
+                                />
+                                <Label
+                                    id="idLabeldrivernumber"
+                                    text="Driver Number:"
+                                    labelFor="driverNumberInput"
+                                    class="sapUiSmallMarginTop"
+                                    required="true"
+                                />
+                                <Input
+                                    id="idDriverNumberInput"
+                                    placeholder="Enter Driver Number.."
+                                />
+                                <Label
+                                    id="idLabelvehType"
+                                    text="Vehicle Type:"
+                                    labelFor="passwordInput"
+                                    class="sapUiSmallMarginTop"
+                                    required="true"
+                                />
+                                <Input
+                                    id="idVehTypeInput"
+                                    placeholder="Enter Vehicle Type.."
+                                />
+                                <Label
+                                    id="idLabelPassword"
+                                    text="Vehicle Number:"
+                                    labelFor="passwordInput"
+                                    class="sapUiSmallMarginTop"
+                                    required="true"
+                                />
+                                <Input
+                                    id="idVehNumberInput"
+                                    placeholder="Enter Vehicle Number..."
+                                />
+                                <HBox
+                                    id="idHBox"
+                                    class="sapUiSmallMarginTop"
+                                    justifyContent="End"
+                                >
+                                    <Button
+                                        id="idButtonLogin"
+                                        text="Submit"
+                                        type="Transparent"
+                                        press="onSubmitPress"
+                                    />
+                                    <Button
+                                        id="idButtoncancel"
+                                        text="Clear"
+                                        type="Transparent"
+                                        press="onCancelPress"
+                                    />
+                                    <!-- <Button id="idButtonSignUp" text="Sign Up" type="Transparent" press="onSignUp"/> -->
+                                </HBox>
+                            </content>
+                        </Panel>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </Page>
+    </App>
+</mvc:View>

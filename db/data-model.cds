@@ -43,3 +43,25 @@ entity TotalHistory {
         outTime       : DateTime;
 //allslots123 : Association to one AllSlots;
 }
+
+entity Reservations {
+    key ID            : UUID;
+        vendorName    : String;
+        vendorNumber  : String;
+        driverName    : String;
+        driverNumber  : String;
+        vehicleType   : String;
+        vehicleNumber : String;
+
+}
+
+entity ReservedSlots {
+    key ID            : UUID;
+        vendorName    : String;
+        vendorNumber  : String;
+        driverName    : String;
+        driverNumber  : String;
+        vehicleType   : String;
+        vehicleNumber : String;
+        reserveSlot   : Association to AllSlots;
+}

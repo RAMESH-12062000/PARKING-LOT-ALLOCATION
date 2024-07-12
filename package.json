@@ -11,10 +11,12 @@
     "express": "^4"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^1"
+    "@cap-js/sqlite": "^1",
+    "@sap/ux-specification": "^1.120.14"
   },
   "scripts": {
     "start": "cds-serve",
-    "watch-parkinglotallocation": "cds watch --open parkinglotallocation/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-parkinglotallocation": "cds watch --open parkinglotallocation/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-vendorpage": "cds watch --open vendorpage/webapp/index.html?sap-ui-xx-viewCache=false"
   }
 }
