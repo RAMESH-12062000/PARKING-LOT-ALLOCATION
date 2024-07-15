@@ -1,18 +1,112 @@
-<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <VBox>
-        <Label text="Vehicle Number" />
-        <Input id="vehicleNumber" />
-        <Label text="Driver Name" />
-        <Input id="driverName" />
-        <Label text="Driver Phone Number" />
-        <Input id="driverPhoneNumber" />
-        <Label text="Slot Number" />
-        <Input id="slotNumber" />
-        <Label text="Date & Time" />
-        <DateTimePicker id="dateTime" />
-        <Label text="Vehicle Type" />
-        <Input id="vehicleType" />
-        <Button text="Assign" press="onAssignPress" />
-        <Button text="Cancel" press="onCancelPress" />
-    </VBox>
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+>
+    <Dialog
+        id="iddialog123"
+        resizable="false"
+        draggable="true"
+        contentWidth="30%"
+        title="Reserved Slot will Allocated to Vehicle:"
+    >
+        <beginButton>
+            <Button
+                id="idReserveSlotAssignConfirm"
+                text="Assign"
+                press="onReserveSlotConfirmBtnPress"
+                type="Transparent"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                id="idCancelreserveslotConfirmButton"
+                text="Cancel"
+                press="onCloseReserveSlotConfirm"
+                type="Transparent"
+            />
+        </endButton>
+        <content>
+            <form:SimpleForm
+                id="idReserveSlotForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false"
+            >
+                <Label
+                    id="idLableReservedSlot"
+                    text="Reserved Slot"
+                />
+                <Input
+                    id="idReservedSlotInput"
+                    editable="false"
+                    value="{oConfirmReservedSlotModel>/slotNumber}"
+                />
+                <Label
+                    id="idLableDriverName14301"
+                    text="Driver Name"
+                />
+                <Input
+                    id="idDriverNameInput"
+                    value="{oConfirmReservedSlotModel>/driverName}"
+                />
+                <Label
+                    id="idLablePhoneNumber14302"
+                    text="Driver Number"
+                />
+                <Input
+                    id="idMobileNumberInput"
+                    value="{oConfirmReservedSlotModel>/driverNumber}"
+                />
+
+                <Label
+                    id="idLableVehicleType14303"
+                    text="Vehicle Type"
+                />
+                <Input
+                    id="idVehTypeInput"
+                    value="{oConfirmReservedSlotModel>/vehicleType}"
+                />
+                <Label
+                    id="idLableVehicleNumber14304"
+                    text="Vehicle Number"
+                />
+                <Input
+                    id="idVehNumberInput"
+                    value="{oConfirmReservedSlotModel>/vehicleNumber}"
+                />
+                <Label
+                    id="idLableSlotNum14305"
+                    text="Transpost Type:"
+                />
+                <Select
+                    id="idselectTransportType"
+                    width="40%"
+                >
+                    <core:Item
+                        id="idCoreSelectinBound"
+                        key="InBound"
+                        text="InBound"
+                    />
+                    <core:Item
+                        id="idCoreSelectOutBound"
+                        key="OutBound"
+                        text="OutBound"
+                    />
+                </Select>
+            </form:SimpleForm>
+        </content>
+    </Dialog>
 </core:FragmentDefinition>

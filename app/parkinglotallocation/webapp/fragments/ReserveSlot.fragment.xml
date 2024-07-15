@@ -52,6 +52,7 @@
                 <Input
                     id="idNewUserNameInput"
                     value="{oConfirmRequestModel>/vendorName}"
+                    editable="false"
                 />
                 <Label
                     id="idLableNumber"
@@ -60,6 +61,7 @@
                 <Input
                     id="idEmailInput"
                     value="{oConfirmRequestModel>/vendorNumber}"
+                    editable="false"
                 />
                 <Label
                     id="idLableDriverName"
@@ -68,6 +70,7 @@
                 <Input
                     id="idUserNameInput"
                     value="{oConfirmRequestModel>/driverName}"
+                    editable="false"
                 />
                 <Label
                     id="idLablePhoneNumber"
@@ -76,6 +79,7 @@
                 <Input
                     id="idPhoneNumberInput"
                     value="{oConfirmRequestModel>/driverNumber}"
+                    editable="false"
                 />
 
                 <Label
@@ -85,6 +89,7 @@
                 <Input
                     id="idCreatePasswordInput"
                     value="{oConfirmRequestModel>/vehicleType}"
+                    editable="false"
                 />
                 <Label
                     id="idLableVehicleNumber"
@@ -93,6 +98,7 @@
                 <Input
                     id="idInputuserType"
                     value="{oConfirmRequestModel>/vehicleNumber}"
+                    editable="false"
                 />
                 <Label
                     id="idLableSlotNum"

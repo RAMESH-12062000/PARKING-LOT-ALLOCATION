@@ -104,6 +104,15 @@ sap.ui.define([
                 }
             },
 
+            //Refresh Btn in AllSlots Table
+            onRefreshBtnPress: function () {
+                this.getView().byId("allSlotsTable").getBinding("items").refresh();
+            },
+            //Refresh Btn in AllocatedSlots Table
+            onRefreshBtnPressAllocated: function () {
+                this.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
+            },
+
             //Assign a slot to vehicle...
             onAssignSlotPress: async function () {
                 debugger;
@@ -124,7 +133,7 @@ sap.ui.define([
 
                 if (!sVehicleNumber.match(/^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/)) {
                     this.getView().byId("idvehicleNumber").setValueState(sap.ui.core.ValueState.Error);
-                    this.getView().byId("idvehicleNumber").setValueStateText("Vehicle Number follows this pattern 'AP09AB1234'");
+                    this.getView().byId("idvehicleNumber").setValueStateText("Vehicle Numbers follows this pattern 'AP09AB1234'");
                     valid = false;
                 } else {
                     this.getView().byId("idvehicleNumber").setValueState(sap.ui.core.ValueState.None);
@@ -139,7 +148,7 @@ sap.ui.define([
 
                 if (!sDriverNumber.match(/^\d{10}$/)) {
                     this.getView().byId("iddriverNumber").setValueState(sap.ui.core.ValueState.Error);
-                    this.getView().byId("iddriverNumber").setValueStateText("Driver Number should contain '10 Digits!'");
+                    this.getView().byId("iddriverNumber").setValueStateText("Mobile Numbers should contain at least '10 Digits!'");
 
                     valid = false;
                 } else {
@@ -148,7 +157,7 @@ sap.ui.define([
 
                 if (sDriverName.length < 4) {
                     this.getView().byId("iddriverName").setValueState(sap.ui.core.ValueState.Error);
-                    this.getView().byId("iddriverName").setValueStateText("Driver Name contains at least '4Letters!'");
+                    this.getView().byId("iddriverName").setValueStateText("Names contains at least '4Letters!'");
                     valid = false;
                 } else {
                     this.getView().byId("iddriverName").setValueState(sap.ui.core.ValueState.None);
@@ -227,11 +236,7 @@ sap.ui.define([
                 }
             },
 
-            //Refresh Btn in AllSlots Table
-            onRefreshBtnPress: function () {
-                this.getView().byId("allSlotsTable").getBinding("items").refresh();
-            },
-
+            //Un Assign the slot after the vehical leavs the Parking Space...
             onUnAssignPress: async function (oEvent) {
                 debugger;
                 const oItem = oEvent.getSource().getParent();
@@ -301,7 +306,6 @@ sap.ui.define([
                 );
             },
 
-
             //Search anything from AllocatedSlots Table...(this way also works fine)
             onLiveSearchAllocatedPress: function (oEvent) {
                 var sQuery = oEvent.getSource().getValue();
@@ -360,7 +364,7 @@ sap.ui.define([
                     var oVendorName = oSelected.getBindingContext().getObject().vendorName
                     var oVendorNumber = oSelected.getBindingContext().getObject().vendorNumber
                     var oDriverName = oSelected.getBindingContext().getObject().driverName
-                    var oDriverNumber = oSelected.getBindingContext().getObject().driverName
+                    var oDriverNumber = oSelected.getBindingContext().getObject().driverNumber
                     var oVehicleType = oSelected.getBindingContext().getObject().vehicleType
                     var oVehicleNumebr = oSelected.getBindingContext().getObject().vehicleNumber
 
@@ -379,7 +383,7 @@ sap.ui.define([
                     }
                     this.onRequestConfirmSlotDialog.open();
                 } else {
-                    MessageToast.show("Please Select a Vendor to Confirm A Slot..!")
+                    MessageToast.show("Please Select a Vendor to Confirm A Slot Reservation..!")
                 }
             },
 
@@ -465,6 +469,230 @@ sap.ui.define([
                 } catch (error) {
                     sap.m.MessageBox.error("Failed to reserve slot: " + error.message);
                     console.error("Error: ", error);
+                }
+            },
+
+            //After confirming Slot, now Supervisor will assign that reserved slot to vendor...Here You cannot change the details like name, slot, etc...
+            onAssignConfirmReserveSlot: async function () {
+                debugger
+                var oSelected = this.byId("idReservedslotsTable").getSelectedItem();
+
+                if (oSelected) {
+                    var oID = oSelected.getBindingContext().getObject().ID
+                    var oSelectSlot = oSelected.getBindingContext().getObject().reserveSlot.slotNumber
+                    var oDriverName = oSelected.getBindingContext().getObject().driverName
+                    var oDriverNumber = oSelected.getBindingContext().getObject().driverNumber
+                    var oVehicleType = oSelected.getBindingContext().getObject().vehicleType
+                    var oVehicleNumebr = oSelected.getBindingContext().getObject().vehicleNumber
+
+                    const oConfirmReservedSlotModel = new JSONModel({
+                        ID: oID,
+                        slotNumber: oSelectSlot,
+                        driverName: oDriverName,
+                        driverNumber: oDriverNumber,
+                        vehicleType: oVehicleType,
+                        vehicleNumber: oVehicleNumebr
+                    });
+                    this.getView().setModel(oConfirmReservedSlotModel, "oConfirmReservedSlotModel");
+                    if (!this.onAssignReserveSlotConfirmDialog) {
+                        this.onAssignReserveSlotConfirmDialog = await this.loadFragment("ParkingLotAssignment")
+                    }
+                    this.onAssignReserveSlotConfirmDialog.open();
+                } else {
+                    MessageToast.show("Please Select a Reserved slot to confirm for the Assignment..!")
+                }
+            },
+            //This is 2nd Method for, After confirming Slot, now Supervisor will assign that reserved slot to vendor & Here You cannot change the details like name, slot, etc...
+            // onAssignConfirmReserveSlot: async function () {
+            //     var oSelected = this.byId("idReservedslotsTable").getSelectedItem();
+
+            //     if (oSelected) {
+            //         var oSelectedData = oSelected.getBindingContext().getObject();
+
+            //         const oConfirmReservedSlotModel = new JSONModel({
+            //             ID: oSelectedData.ID,
+            //             slotNumber: oSelectedData.reserveSlot.slotNumber,
+            //             driverName: oSelectedData.driverName,
+            //             driverNumber: oSelectedData.driverNumber,
+            //             vehicleType: oSelectedData.vehicleType,
+            //             vehicleNumber: oSelectedData.vehicleNumber
+            //         });
+            //         this.getView().setModel(oConfirmReservedSlotModel, "oConfirmReservedSlotModel");
+
+            //         if (!this.onAssignReserveSlotConfirmDialog) {
+            //             this.onAssignReserveSlotConfirmDialog = await this.loadFragment("ParkingLotAssignment");
+            //         }
+            //         this.onAssignReserveSlotConfirmDialog.open();
+            //     } else {
+            //         MessageToast.show("Please Select a Reserved slot to confirm for the Assignment..!");
+            //     }
+            // },
+
+
+            /** After Getting the Reserved Slot Data, if you want to change the details here u can change(here slot can't changed.!).
+            press on the Assign buttin the slot will trigger at Allocated slots and slot status will be Changed... */
+            onReserveSlotConfirmBtnPress: async function () {
+                debugger;
+                try {
+                    const oSelectedItem = this.getView().byId("idReservedslotsTable").getSelectedItem();
+                    if (!oSelectedItem) {
+                        MessageToast.show("Please select a reserved slot to confirm assignment.");
+                        return;
+                    }
+
+                    const oSelectedData = oSelectedItem.getBindingContext().getObject();
+
+                    const oDriverName = this.byId("idDriverNameInput").getValue();
+                    const oDriverNumber = this.byId("idMobileNumberInput").getValue();
+                    const oVehicleType = this.byId("idVehTypeInput").getValue();
+                    const oVehicleNumber = this.byId("idVehNumberInput").getValue();
+                    const oServiceType = this.byId("idselectTransportType").getSelectedKey();
+                    const oSlotNumber = this.byId("idReservedSlotInput").getValue();
+
+                    const oThis = this
+                    const oModel = this.getView().getModel("ModelV2");
+
+                    // Validation: Check if all fields are filled
+                    if (!oDriverName || !oDriverNumber || !oVehicleType || !oVehicleNumber || !oServiceType || !oSlotNumber) {
+                        MessageBox.error("All fields are required.");
+                        return;
+                    }
+
+                    // Validation: Check if driver name contains at least 4 letters
+                    if (oDriverName.length < 4) {
+                        this.byId("idDriverNameInput").setValueState("Error");
+                        this.byId("idDriverNameInput").setValueStateText("Driver name should contain at least 4 letters.");
+                        return;
+                    } else {
+                        this.byId("idDriverNameInput").setValueState("None");
+                    }
+
+                    // Validation: Check if mobile number follows the format and uniqueness
+                    const mobileNumberPattern = /^[0-9]{10}$/;
+                    if (!mobileNumberPattern.test(oDriverNumber)) {
+                        this.byId("idMobileNumberInput").setValueState("Error");
+                        this.byId("idMobileNumberInput").setValueStateText("Mobile Number should contain 10 digits.");
+                        return;
+                    }
+
+                    // Validation: Check if vehicle number follows the format
+                    const vehicleNumberPattern = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+                    if (!vehicleNumberPattern.test(oVehicleNumber)) {
+                        this.byId("idVehNumberInput").setValueState("Error");
+                        this.byId("idVehNumberInput").setValueStateText("Vehicle Number should be in the format 'AP00AA0000'.");
+                        return;
+                    }
+
+                    // Check if driver number already exists in Allocated Slots
+                    const allocatedSlotsData = await new Promise((resolve, reject) => {
+                        oModel.read("/AllocatedSlots", {
+                            success: function (oData) {
+                                resolve(oData.results);
+                            },
+                            error: function (oError) {
+                                reject(oError);
+                            }
+                        });
+                    });
+
+                    const bDriverNumberExists = allocatedSlotsData.some(slot => slot.driverNumber === oDriverNumber);
+                    if (bDriverNumberExists) {
+                        MessageBox.error("Driver Number already Existed..!");
+                        this.byId("idMobileNumberInput").setValueState("Error");
+                        this.byId("idMobileNumberInput").setValueStateText("Mobile Number should be unique.");
+                        return;
+                    }
+
+                    const bVehicleNumberExists = allocatedSlotsData.some(slot => slot.vehicleNumber === oVehicleNumber);
+                    if (bVehicleNumberExists) {
+                        MessageBox.error("Vehicle Number already Existed..!");
+                        this.byId("idVehNumberInput").setValueState("Error");
+                        this.byId("idVehNumberInput").setValueStateText("Vehicle Number should be in the format 'AP00AA0000'.");
+                        return;
+                    }
+
+                    //New entry JSON to Allocated Slots...
+                    const oNewAllocatedSlot = {
+                        vehicleType: oVehicleType,
+                        vehicleNumber: oVehicleNumber,
+                        driverNumber: oDriverNumber,
+                        driverName: oDriverName,
+                        serviceType: oServiceType,
+                        inTime: new Date(),
+                        slotNum: {
+                            ID: oSelectedData.reserveSlot.ID,
+                            slotNumber: oSlotNumber
+                        }
+                    };
+
+                    // Create a new entry in AllocatedSlots
+                    await new Promise((resolve, reject) => {
+                        oModel.create("/AllocatedSlots", oNewAllocatedSlot, {
+                            success: () => {
+                                MessageBox.success("Slot assigned successfully!");
+                                resolve();
+                            },
+                            error: (oError) => {
+                                MessageBox.error("Failed to assign slot: " + oError.message);
+                                reject(oError);
+                            }
+                        });
+                    });
+
+                    // Update the slot status in AllSlots to "Occupied"
+                    await new Promise((resolve, reject) => {
+                        oModel.update("/AllSlots(" + oSelectedData.reserveSlot.ID + ")", { status: 'Occupied' }, {
+                            success: () => {
+                                MessageBox.success("Slot status changed to Occupied!");
+                                resolve();
+                            },
+                            error: (oError) => {
+                                MessageBox.error("Failed to update slot status: " + oError.message);
+                                reject(oError);
+                            }
+                        });
+                    });
+
+                    //Remove That request after confirm or reject
+                    const sReservedSlotPath = oSelectedItem.getBindingContext().getPath();
+                    await new Promise((resolve, reject) => {
+                        oModel.remove(sReservedSlotPath, {
+                            success: () => {
+                                MessageToast.show("Reserved slot entry removed successfully.");
+                                oThis.getView().byId("idReservedslotsTable").getBinding("items").refresh();
+                                resolve();
+                            },
+                            error: (oError) => {
+                                MessageBox.error("Failed to remove reserved slot entry: " + oError.message);
+                                reject(oError);
+                            }
+                        });
+                    });
+
+                    // Refresh the tables
+                    //this.getView().byId("idReservedslotsTable").getBinding("items").refresh();
+                    //this.getView().byId("idAllocatedSlotsTable").getBinding("items").refresh();
+                    //this.getView().byId("idAllSlotsTable").getBinding("items").refresh();
+
+                    // Close the dialog
+                    this.onAssignReserveSlotConfirmDialog.close();
+                } catch (error) {
+                    MessageBox.error("An error occurred: " + error.message);
+                    console.error("Error: ", error);
+                }
+            },
+
+            //for closing Opened Dialog in Reserved Slots table...
+            onCloseReserveSlotConfirm: function () {
+                if (this.onAssignReserveSlotConfirmDialog) {
+                    this.onAssignReserveSlotConfirmDialog.close();
+                }
+            },
+
+            //for closing Opened Dialog in Reservations Table...
+            onCloseReserveSlotDialog: function () {
+                if (this.onRequestConfirmSlotDialog) {
+                    this.onRequestConfirmSlotDialog.close();
                 }
             }
 

@@ -454,11 +454,29 @@
                                             id="TitleAllocated"
                                             text="ASSIGNED SLOTS:"
                                         />
+                                        <m:ToolbarSpacer id="idtoolSearch133" />
+                                        <m:Button
+                                            id="idBtnRefreshAllocated"
+                                            tooltip="Refresh"
+                                            icon="sap-icon://refresh"
+                                            press="onRefreshBtnPressAllocated"
+                                        />
                                         <m:SearchField
                                             id="idSearchFieldAllocated"
                                             liveChange="onLiveSearchAllocatedPress"
                                             placeholder="Search Anything..."
                                             width="20%"
+                                        />
+                                    </Toolbar>
+                                </form:toolbar>
+                                <form:content>
+                                    <Toolbar
+                                        id="IDGenToolbarallocated2"
+                                        ariaLabelledBy="Title2"
+                                    >
+                                        <Title
+                                            id="Title4"
+                                            text="Assigned Slots from the Parking Space:"
                                         />
                                         <ToolbarSpacer
                                             id="IDGenToolbarSpacerallocated"
@@ -482,17 +500,6 @@
                                             type="Transparent"
                                             press="onCancel"
                                             visible="false"
-                                        />
-                                    </Toolbar>
-                                </form:toolbar>
-                                <form:content>
-                                    <Toolbar
-                                        id="IDGenToolbarallocated2"
-                                        ariaLabelledBy="Title2"
-                                    >
-                                        <Title
-                                            id="Title4"
-                                            text="Assigned Slots from the Parking Space:"
                                         />
                                     </Toolbar>
                                     <Table
@@ -703,6 +710,12 @@
                                                     text="Vehicle Number:"
                                                 />
                                             </Column>
+                                            <Column id="IDGenColumn007">
+                                                <Text
+                                                    id="IDGenText007"
+                                                    text="Reserve Date:"
+                                                />
+                                            </Column>
                                         </columns>
                                         <items>
                                             <ColumnListItem
@@ -732,6 +745,10 @@
                                                     <Text
                                                         id="IDGenAvailText6"
                                                         text="{vehicleNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenAvailText7"
+                                                        text=""
                                                     />
                                                 </cells>
                                             </ColumnListItem>
@@ -777,6 +794,14 @@
                                             text="RESERVED SLOTS FROM VENDORS:"
                                         />
                                         <ToolbarSpacer id="IDGenToolbar567" />
+                                        <m:Button
+                                            id="idBtnReServeAssignConfirm"
+                                            text="Assign"
+                                            press="onAssignConfirmReserveSlot"
+                                            type="Transparent"
+                                            tooltip="ReservedSlotConfirm"
+                                            icon="sap-icon://activity-assigned-to-goal"
+                                        />
                                     </Toolbar>
                                 </form:toolbar>
                                 <form:content>
