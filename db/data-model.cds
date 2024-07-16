@@ -1,13 +1,5 @@
 namespace my.parkinglot;
 
-entity Users {
-    key ID          : UUID;
-        name        : String;
-        phoneNumber : String;
-        email       : String;
-        address     : String;
-}
-
 entity AllSlots {
     key ID          : UUID;
         slotNumber  : String;
@@ -52,6 +44,7 @@ entity Reservations {
         driverNumber  : String;
         vehicleType   : String;
         vehicleNumber : String;
+        inTime        : DateTime;
 
 }
 
@@ -65,3 +58,14 @@ entity ReservedSlots {
         vehicleNumber : String;
         reserveSlot   : Association to AllSlots;
 }
+
+// entity Notify {
+//     key ID            : UUID;
+//         vendorName    : String;
+//         vendorNumber  : String;
+//         driverName    : String;
+//         driverNumber  : String;
+//         vehicleType   : String;
+//         vehicleNumber : String;
+//         inTime        : DateTime;
+// }

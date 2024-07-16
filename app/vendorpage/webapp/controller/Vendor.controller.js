@@ -116,15 +116,28 @@ sap.ui.define([
                     driverName: sDriverName,
                     driverNumber: sDriverNumber,
                     vehicleType: sVehicleType,
-                    vehicleNumber: sVehicleNumber
+                    vehicleNumber: sVehicleNumber,
+                    inTime: new Date().toISOString()
                 });
+                // const notifyModel = new sap.ui.model.json.JSONModel({
+                //     vendorName: sVendorName,
+                //     vendorNumber: sVendorNumber,
+                //     driverName: sDriverName,
+                //     driverNumber: sDriverNumber,
+                //     vehicleType: sVehicleType,
+                //     vehicleNumber: sVehicleNumber,
+                //     inTime: new Date().toISOString()
+                // });
             
                 this.getView().setModel(reservationModel, "reservationModel");
+                //this.getView().setModel(notifyModel, "notifyModel");
                 const oPayload = this.getView().getModel("reservationModel").getProperty("/");
+                //const oPayload1 = this.getView().getModel("notifyModel").getProperty("/");
                 console.log("Payload: ", oPayload);
             
                 try {
                     await this.createData(oModel, oPayload, "/Reservations");
+                    //await this.createData(oModel, oPayload1, "/Notify");
                     debugger;
                     MessageToast.show("Your details registered successfully!");
                     //After succefully pass the test cases and create and Cleared...

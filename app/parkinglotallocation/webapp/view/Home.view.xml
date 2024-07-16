@@ -77,11 +77,25 @@
                 </m:HBox>
 
                 <ToolbarSpacer id="IDGenToolbarSpacer2" />
-
+                <Button
+                    id="idReturnedBooksBtn"
+                    icon="sap-icon://bell"
+                    tooltip="Notifications"
+                    press="onNotificationPress"
+                >
+                    <customData>
+                        <BadgeCustomData
+                            id="idBadge"
+                            class="badge"
+                            value="{/Reservations/$count}"
+                            visible="true"
+                        />
+                    </customData>
+                </Button>
                 <Button
                     id="IDGenButton1"
                     type="Transparent"
-                    tooltip="Visualization"
+                    tooltip="Data Visualization"
                     icon="sap-icon://geographic-bubble-chart"
                     press="onGeographicBtnPress"
                 />
@@ -569,10 +583,25 @@
                                                 id="IDGenAllocatedColListItems"
                                             >
                                                 <cells>
-                                                    <Text
-                                                        id="IDGenText01"
-                                                        text="{slotNum/slotNumber}"
-                                                    />
+                                                    <VBox id="idVboxSelectslot">
+                                                        <Text
+                                                            id="IDGenText01"
+                                                            text="{slotNum/slotNumber}"
+                                                            visible="true"
+                                                        />
+                                                        <ComboBox
+                                                            id="idSelectSlotfromAvailable"
+                                                            items="{path: '/AllSlots',filters: [{ path: 'status', operator: 'EQ', value1: 'Available' }], templateShareable:true}"
+                                                            visible="false"
+                                                            placeholder="Select Slot"
+                                                        >
+                                                            <core:Item
+                                                                id="idcoreitemselct"
+                                                                key="{slotNumber}"
+                                                                text="{slotNumber}"
+                                                            />
+                                                        </ComboBox>
+                                                    </VBox>
                                                     <Text
                                                         id="IDGenText07"
                                                         text="{vehicleType}"
@@ -605,6 +634,17 @@
                                                         class="UnAssignBtn"
                                                         press="onUnAssignPress"
                                                     />
+                                                    <!-- <ComboBox
+                                                        id="idSlotNumberComboBox"
+                                                        items="{path: '/AllSlots',filters: [{ path: 'status', operator: 'EQ', value1: 'Available' }]}"
+                                                        visible="false"
+                                                    >
+                                                        <core:Item
+                                                            id="idcoreitemselected"
+                                                            key="{slotNumber}"
+                                                            text="{slotNumber}"
+                                                        />
+                                                    </ComboBox> -->
                                                 </cells>
                                             </ColumnListItem>
                                         </items>
@@ -649,6 +689,13 @@
                                             text="RESERVATIONS:"
                                         />
                                         <ToolbarSpacer id="IDGenToolbar345" />
+                                        <m:Button
+                                            id="idBtnReject"
+                                            text="Reject"
+                                            press="onRejectConfirmSlotPress"
+                                            type="Transparent"
+                                            class="reservationrejectbtn"
+                                        />
                                         <m:Button
                                             id="idBtnRequest"
                                             text="Confirm"
@@ -748,7 +795,7 @@
                                                     />
                                                     <Text
                                                         id="IDGenAvailText7"
-                                                        text=""
+                                                        text="{inTime}"
                                                     />
                                                 </cells>
                                             </ColumnListItem>

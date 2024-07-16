@@ -14,6 +14,8 @@ sap.ui.define([
         return Controller.extend("com.app.parkinglotallocation.controller.Home", {
 
             onInit: function () {
+                //AllSlots Data Visuals...
+                this._setParkingLotModel();
 
                 //Supervisor details
                 var oSupervisorData = {
@@ -69,19 +71,199 @@ sap.ui.define([
             },
 
             onEdit: function () {
-                // this.aProductCollection = deepExtend([], this.oModel.getProperty("/ProductCollection"));
+                var oTable = this.byId("AllocatedSlotsTable");
+                var oSelectedItem = oTable.getSelectedItem();
+
+                if (!oSelectedItem) {
+                    MessageToast.show("Please select a slot to edit.");
+                    return;
+                }
+
+                var oVBox = oSelectedItem.getCells()[0];
+                var oText = oVBox.getItems()[0];
+                var oComboBox = oVBox.getItems()[1];
+
+                oText.setVisible(false);
+                oComboBox.setVisible(true);
+
                 this.byId("editButton").setVisible(false);
                 this.byId("saveButton").setVisible(true);
                 this.byId("cancelButton").setVisible(true);
-                this.rebindTable(this.oEditableTemplate, "Edit");
             },
 
+            // onSave: async function () {
+            //     debugger
+            //     var oTable = this.byId("AllocatedSlotsTable");
+            //     var oSelectedItem = oTable.getSelectedItem();
+
+            //     if (!oSelectedItem) {
+            //         MessageToast.show("Please select a slot to save.");
+            //         return;
+            //     }
+
+            //     var oVBox = oSelectedItem.getCells()[0];
+            //     var oText = oVBox.getItems()[0];
+            //     var oComboBox = oVBox.getItems()[1];
+
+            //     var sNewSlotNumber = oComboBox.getSelectedKey();
+            //     var oContext = oSelectedItem.getBindingContext();
+            //     var oData = oContext.getObject();
+            //     var oModel = this.getView().getModel("ModelV2");
+
+            //     if (!sNewSlotNumber) {
+            //         MessageToast.show("Please select a new slot number.");
+            //         return;
+            //     }
+
+            //     try {
+            //         // Update AllocatedSlots with the new slot number
+            //         await new Promise((resolve, reject) => {
+            //             oModel.update(oContext.getPath(), { slotNum: { slotNumber: sNewSlotNumber } }, {
+            //                 success: resolve,
+            //                 error: reject
+            //             });
+            //         });
+
+            //         // Update AllSlots table: old slot to "Available", new slot to "Occupied"
+            //         debugger
+            //         await new Promise((resolve, reject) => {
+            //             oModel.update("/AllSlots('" + oData.slotNum.ID + "')", { status: 'Available' }, {
+            //                 success: resolve,
+            //                 error: reject
+            //             });
+            //         });
+
+            //         // debugger
+            //         // await new Promise((resolve, reject) => {
+            //         //     oModel.update("/AllSlots('" + sNewSlotNumber + "')", { status: 'Occupied' }, {
+            //         //         success: resolve,
+            //         //         error: reject
+            //         //     });
+            //         // });
+
+            //         MessageBox.success("Slot assignment updated successfully!");
+
+            //         oComboBox.setVisible(false);
+            //         oText.setVisible(true);
+            //         oText.setText(sNewSlotNumber);
+
+            //         // Refresh the table
+            //         oTable.getBinding("items").refresh();
+
+            //         // Hide Save and Cancel buttons, show Edit button
+            //         this.byId("editButton").setVisible(true);
+            //         this.byId("saveButton").setVisible(false);
+            //         this.byId("cancelButton").setVisible(false);
+            //     } catch (error) {
+            //         MessageBox.error("Failed to update slot assignment: " + error.message);
+            //     }
+            // },
+
+
+            onSave: async function () {
+                var oTable = this.byId("AllocatedSlotsTable");
+                var oSelectedItem = oTable.getSelectedItem();
+
+                if (!oSelectedItem) {
+                    MessageToast.show("Please select a slot to save.");
+                    return;
+                }
+
+                var oVBox = oSelectedItem.getCells()[0];
+                var oText = oVBox.getItems()[0];
+                var oComboBox = oVBox.getItems()[1];
+
+                var sNewSlotNumber = oComboBox.getSelectedKey();
+                if (!sNewSlotNumber) {
+                    MessageToast.show("Please select a new slot number.");
+                    return;
+                }
+
+                var oContext = oSelectedItem.getBindingContext();
+                var oData = oContext.getObject();
+                var oModel = this.getView().getModel("ModelV2");
+
+                try {
+                    // Retrieve the id for the new slot number
+                    var aAllSlotsData = await new Promise((resolve, reject) => {
+                        oModel.read("/AllSlots", {
+                            success: function (oData) {
+                                resolve(oData.results);
+                            },
+                            error: reject
+                        });
+                    });
+
+                    var oNewSlot = aAllSlotsData.find(slot => slot.slotNumber === sNewSlotNumber);
+                    var oOldSlot = aAllSlotsData.find(slot => slot.slotNumber === oData.slotNum.slotNumber);
+
+                    if (!oNewSlot) {
+                        throw new Error("New slot not found in AllSlots table.");
+                    }
+
+                    // Update AllocatedSlots with the new slot number
+                    await new Promise((resolve, reject) => {
+                        oModel.update(oContext.getPath(), { slotNum: { slotNumber: sNewSlotNumber } }, {
+                            success: resolve,
+                            error: reject
+                        });
+                    });
+
+                    // Update AllSlots table: old slot to "Available", new slot to "Occupied"
+                    if (oOldSlot) {
+                        await new Promise((resolve, reject) => {
+                            oModel.update("/AllSlots(" + oOldSlot.ID + ")", { status: 'Available' }, {
+                                success: resolve,
+                                error: reject
+                            });
+                        });
+                    }
+
+                    await new Promise((resolve, reject) => {
+                        oModel.update("/AllSlots(" + oNewSlot.ID + ")", { status: 'Occupied' }, {
+                            success: resolve,
+                            error: reject
+                        });
+                    });
+
+                    MessageBox.success("Slot assignment updated successfully!");
+
+                    oComboBox.setVisible(false);
+                    oText.setVisible(true);
+                    oText.setText(sNewSlotNumber);
+
+                    // Refresh the table
+                    oTable.getBinding("items").refresh();
+
+                    // Hide Save and Cancel buttons, show Edit button
+                    this.byId("editButton").setVisible(true);
+                    this.byId("saveButton").setVisible(false);
+                    this.byId("cancelButton").setVisible(false);
+                } catch (error) {
+                    MessageBox.error("Failed to update slot assignment: " + error.message);
+                }
+            },
+
+
             onCancel: function () {
-                this.byId("cancelButton").setVisible(false);
-                this.byId("saveButton").setVisible(false);
+                var oTable = this.byId("AllocatedSlotsTable");
+                var oSelectedItem = oTable.getSelectedItem();
+
+                if (!oSelectedItem) {
+                    MessageToast.show("Please select a slot to cancel.");
+                    return;
+                }
+
+                var oVBox = oSelectedItem.getCells()[0];
+                var oText = oVBox.getItems()[0];
+                var oComboBox = oVBox.getItems()[1];
+
+                oComboBox.setVisible(false);
+                oText.setVisible(true);
+
                 this.byId("editButton").setVisible(true);
-                //this.oModel.setProperty("/ProductCollection", this.aProductCollection);
-                this.rebindTable(this.oReadOnlyTemplate, "Navigation");
+                this.byId("saveButton").setVisible(false);
+                this.byId("cancelButton").setVisible(false);
             },
 
             //if click on menu btn then opens side bar..
@@ -356,6 +538,50 @@ sap.ui.define([
             },
 
             //=============================================================>For Vendor View operations...!!
+            onRejectConfirmSlotPress: function () {
+                var oSelectedItem = this.getView().byId("idReservationsTable").getSelectedItem();
+                if (!oSelectedItem) {
+                    MessageToast.show("Please select a reservation to reject.");
+                    return;
+                }
+
+                var sPath = oSelectedItem.getBindingContext().getPath();
+                var oModel = this.getView().getModel("ModelV2");
+                var oThis = this;
+
+                MessageBox.warning(
+                    "Are you sure you want to Reject this RESERVATION..?",
+                    {
+                        actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                        onClose: async function (sAction) {
+                            if (sAction === MessageBox.Action.YES) {
+                                try {
+                                    // Remove the entry from Reservations
+                                    await new Promise((resolve, reject) => {
+                                        oModel.remove(sPath, {
+                                            success: function () {
+                                                MessageBox.success("Reservation rejected successfully.");
+                                                oThis.getView().byId("idReservationsTable").getBinding("items").refresh();
+                                                resolve();
+                                            },
+                                            error: function (oError) {
+                                                MessageBox.error("Failed to reject reservation: " + oError.message);
+                                                reject(oError);
+                                            }
+                                        });
+                                    });
+                                } catch (error) {
+                                    MessageBox.error("An error occurred: " + error.message);
+                                    console.error("Error: ", error);
+                                }
+                            }
+                        }
+                    }
+                );
+            },
+
+
+            //vendor reservation slot request...
             onRequestConfirmSlotPress: async function () {
                 var oSelected = this.byId("idReservationsTable").getSelectedItem();
                 if (oSelected) {
@@ -694,7 +920,80 @@ sap.ui.define([
                 if (this.onRequestConfirmSlotDialog) {
                     this.onRequestConfirmSlotDialog.close();
                 }
-            }
+            },
+
+            //Notifications from Vendor reservation slot details...
+            onNotificationPress: function (oEvent) {
+                var oButton = oEvent.getSource(),
+                    oView = this.getView();
+
+                // create popover
+                if (!this._pPopover) {
+                    this._pPopover = this.loadFragment("ReserveSlotNotify").then(function (oPopover) {
+                        oView.addDependent(oPopover);
+                        oPopover.bindElement("");
+                        return oPopover;
+                    });
+                }
+                this._pPopover.then(function (oPopover) {
+                    oPopover.openBy(oButton);
+                });
+            },
+
+
+            //Data Visualization from Supervisor page, which is fetches the data from All slots Table...
+            onGeographicBtnPress: async function () {
+                if (!this.onDatavisualizationDialog) {
+                    this.onDatavisualizationDialog = await this.loadFragment("DataVisualization")
+                }
+                this.onDatavisualizationDialog.open();
+            },
+            _setParkingLotModel: function () {
+                // Fetch data from OData service
+                var oModel = this.getOwnerComponent().getModel("ModelV2");
+                var that = this;
+
+                oModel.read("/AllSlots", {
+                    success: function (oData) {
+                        var aItems = oData.results;
+                        var availableCount = aItems.filter(item => item.status === "Available").length;
+                        var occupiedCount = aItems.filter(item => item.status === "Occupied").length;
+                        var ReservedCount = aItems.filter(item => item.status === "Reserved").length;
+
+                        var aChartData = {
+                            Items: [
+                                {
+                                    status: "Available",
+                                    Count: availableCount
+                                },
+                                {
+                                    status: "Occupied",
+                                    Count: occupiedCount
+                                },
+                                {
+                                    status: "Reserved",
+                                    Count: ReservedCount
+                                }
+                            ]
+                        };
+                        var oParkingLotModel = new JSONModel();
+                        oParkingLotModel.setData(aChartData);
+                        that.getView().setModel(oParkingLotModel, "ParkingLotModel");
+                    },
+                    error: function (oError) {
+                        // Handle error
+                        console.error(oError);
+                    }
+                });
+            },
+
+
+            //for closing Pie Chart for Data visualization...
+            onClosePiechartDialog: function () {
+                if (this.onDatavisualizationDialog) {
+                    this.onDatavisualizationDialog.close();
+                }
+            },
 
         });
     });

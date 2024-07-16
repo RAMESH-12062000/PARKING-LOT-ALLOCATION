@@ -66,6 +66,8 @@
     margin-right: 0.5rem;
 }
 
+
+
 /* .RadioButtons{
     margin-right: 2rem; 
 }
@@ -108,4 +110,8 @@
     .descriptionContainer {
         text-align: center;
     }
+}
+
+.reservationrejectbtn{
+    color: red;
 }

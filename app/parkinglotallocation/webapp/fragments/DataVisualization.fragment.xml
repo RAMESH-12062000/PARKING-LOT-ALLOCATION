@@ -1,0 +1,86 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:suite="sap.suite.ui.commons"
+>
+    <Dialog
+        id="iddialogVisuals"
+        title="Data Visualization:"
+        draggable="true"
+        resizable="false"
+        stretch="false"
+        contentWidth="70%"
+        contentHeight="70%"
+    >
+        <endButton>
+            <Button
+                id="idbtn"
+                text="Close"
+                press="onClosePiechartDialog"
+            />
+        </endButton>
+        <VBox
+            id="vbox"
+            fitContainer="true"
+        >
+            <suite:ChartContainer id="chartContainer">
+                <suite:content>
+                    <suite:ChartContainerContent id="chartContainerContent">
+                        <suite:content>
+                            <viz:VizFrame
+                                id="idpiechart"
+                                width="auto"
+                                uiConfig="{applicationSet:'fiori'}"
+                                vizType="pie"
+                                vizProperties="{
+                                plotArea: {dataLabel: {visible: true}},title: {text:'PARKING LOT MANAGEMENT:'}}"
+                                selectData="myOnClickHandler"
+                                renderComplete="handleRenderComplete"
+                            >
+                                <viz:dataset>
+                                    <viz.data:FlattenedDataset
+                                        id="flattenData"
+                                        data="{ParkingLotModel>/Items}"
+                                    >
+                                        <viz.data:dimensions>
+                                            <viz.data:DimensionDefinition
+                                                id="_IDGenDimensionDefinition1"
+                                                name="status"
+                                                value="{ParkingLotModel>status}"
+                                            />
+                                        </viz.data:dimensions>
+                                        <viz.data:measures>
+                                            <viz.data:MeasureDefinition
+                                                id="_IDGenMeasureDefinition1"
+                                                name="Count"
+                                                value="{ParkingLotModel>Count}"
+                                            />
+                                        </viz.data:measures>
+                                    </viz.data:FlattenedDataset>
+                                </viz:dataset>
+
+                                <viz:feeds>
+                                    <viz.feeds:FeedItem
+                                        id="_IDGenFeedItem1"
+                                        uid="size"
+                                        type="Measure"
+                                        values="Count"
+                                    />
+                                    <viz.feeds:FeedItem
+                                        id="_IDGenFeedItem2"
+                                        uid="color"
+                                        type="Dimension"
+                                        values="status"
+                                    />
+                                </viz:feeds>
+                            </viz:VizFrame>
+                        </suite:content>
+                    </suite:ChartContainerContent>
+                </suite:content>
+            </suite:ChartContainer>
+        </VBox>
+    </Dialog>
+</core:FragmentDefinition>
