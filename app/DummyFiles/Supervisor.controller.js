@@ -163,6 +163,188 @@ sap.ui.define([
         }
       },
 
+      //Assigning with Validations and sms and Announcement....
+      onAssignSlotPress: async function () {
+        debugger;
+        var sSlotNumber = this.getView().byId("idparkingLotSelect").getSelectedKey();
+        var sVehicleNumber = this.getView().byId("idvehicleNumber").getValue();
+        var sVehicleType = this.getView().byId("idvehicleType").getValue();
+        var sDriverNumber = this.getView().byId("iddriverNumber").getValue();
+        var sDriverName = this.getView().byId("iddriverName").getValue();
+        var sServiceType = this.getView().byId("idTypeOfDelivery").getSelectedKey();
+
+        var valid = true;
+        if (!sSlotNumber) {
+          this.getView().byId("idparkingLotSelect").setValueState(sap.ui.core.ValueState.Error);
+          valid = false;
+        } else {
+          this.getView().byId("idparkingLotSelect").setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (!sVehicleNumber.match(/^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/)) {
+          this.getView().byId("idvehicleNumber").setValueState(sap.ui.core.ValueState.Error);
+          this.getView().byId("idvehicleNumber").setValueStateText("Vehicle Numbers follows this pattern 'AP09AB1234'");
+          valid = false;
+        } else {
+          this.getView().byId("idvehicleNumber").setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (!sVehicleType) {
+          this.getView().byId("idvehicleType").setValueState(sap.ui.core.ValueState.Error);
+          valid = false;
+        } else {
+          this.getView().byId("idvehicleType").setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (!sDriverNumber.match(/^\d{10}$/)) {
+          this.getView().byId("iddriverNumber").setValueState(sap.ui.core.ValueState.Error);
+          this.getView().byId("iddriverNumber").setValueStateText("Mobile Numbers should contain at least '10 Digits!'");
+
+          valid = false;
+        } else {
+          this.getView().byId("iddriverNumber").setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (sDriverName.length < 4) {
+          this.getView().byId("iddriverName").setValueState(sap.ui.core.ValueState.Error);
+          this.getView().byId("iddriverName").setValueStateText("Names contains at least '4Letters!'");
+          valid = false;
+        } else {
+          this.getView().byId("iddriverName").setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (!sServiceType) {
+          this.getView().byId("idTypeOfDelivery").setValueState(sap.ui.core.ValueState.Error);
+          this.getView().byId("idTypeOfDelivery").setValueStateText("Select Service Type in 'Dropdown'");
+          valid = false;
+        } else {
+          this.getView().byId("idTypeOfDelivery").setValueState(sap.ui.core.ValueState.None);
+        }
+
+        if (!valid) {
+          MessageBox.error("Please fill all fields correctly.");
+          return;
+        }
+        const assignmentModel = new sap.ui.model.json.JSONModel({
+          vehicleType: sVehicleType,
+          vehicleNumber: sVehicleNumber,
+          driverNumber: sDriverNumber,
+          driverName: sDriverName,
+          serviceType: sServiceType,
+          inTime: new Date().toISOString(),
+          slotNum_ID: sSlotNumber // Ensure the association is correctly set
+        });
+        this.getView().setModel(assignmentModel, "assignmentModel");
+        const oPayload = this.getView().getModel("assignmentModel").getProperty("/");
+        const oModel = this.getView().getModel("ModelV2");
+
+        console.log("Payload: ", oPayload);
+
+        try {
+          // Create the assignment in AllocatedSlots
+          await this.createData(oModel, oPayload, "/AllocatedSlots");
+
+          //Update the slot status in All Slots table
+          debugger
+          const sSlotFilter = new sap.ui.model.Filter("ID", sap.ui.model.FilterOperator.EQ, sSlotNumber);
+          oModel.read("/AllSlots", {
+            filters: [sSlotFilter],
+            success: function (oData) {
+              if (oData.results.length > 0) {
+                var oSlotData = oData.results[0];
+                oSlotData.status = "Occupied"; // Change the status to "Occupied"
+                const sSlotPath = `/AllSlots(${sSlotNumber})`; // Assuming 'ID' is the key field
+                oModel.update(sSlotPath, oSlotData, {
+                  success: function () {
+                    MessageToast.show("Slot status updated to 'Occupied'.");
+                    this.getView().byId("allSlotsTable").getBinding("items").refresh(); // Refresh the model to get the latest data
+                  }, error: function (oError) {
+                    MessageBox.error("Failed to update slot status: " + oError.message);
+                  }
+                });
+              } else {
+                MessageBox.error("Slot not found.");
+              }
+            },
+            error: function (oError) {
+              MessageBox.error("Failed to fetch slot data: " + oError.message);
+            }
+          });
+
+          //After Assigning the Announcement will be raised...
+          function makeAnnouncement(message, lang = 'en-US') {
+            // Check if the browser supports the Web Speech API
+            if ('speechSynthesis' in window) {
+              // Create a new instance of SpeechSynthesisUtterance
+              var utterance = new SpeechSynthesisUtterance(message);
+
+              // Set properties (optional)
+              utterance.pitch = 1; // Range between 0 (lowest) and 2 (highest)
+              utterance.rate = 0.77;  // Range between 0.1 (lowest) and 10 (highest)
+              utterance.volume = 1; // Range between 0 (lowest) and 1 (highest)
+              utterance.lang = lang; // Set the language
+
+              // Speak the utterance
+              window.speechSynthesis.speak(utterance);
+            } else {
+              console.log('Sorry, your browser does not support the Web Speech API.');
+            }
+          }
+
+          // Example usage
+          makeAnnouncement(`कृपया ध्यान दें। वाहन नंबर ${sVehicleNumber} को स्लॉट नंबर ${sSlotNumber} द्वारा आवंटित किया गया है।`, 'hi-IN');
+          makeAnnouncement(`దయచేసి వినండి. వాహనం నంబర్ ${sVehicleNumber} కు స్లాట్ నంబర్ ${sSlotNumber} కేటాయించబడింది.`, 'te-IN');
+
+          // Refresh the tables
+          this.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
+          MessageToast.show("Slot assigned successfully");
+          this.getView().byId("idparkingLotSelect").setSelectedKey("");
+          this.getView().byId("idvehicleNumber").setValue("");
+          this.getView().byId("idvehicleType").setValue("");
+          this.getView().byId("iddriverNumber").setValue("");
+          this.getView().byId("iddriverName").setValue("");
+          this.getView().byId("idTypeOfDelivery").setSelectedKey("");
+
+          var driverPhoneFull = "+91" + sDriverNumber;
+
+          // Twilio API credentials
+          const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
+          const authToken = '047d24b2591bc6a8391c11c22cbcefea';
+          const fromNumber = '+16187243098';
+
+          const messageBody = `Hello ${sDriverName}, your vehicle with number ${sVehicleNumber} has been assigned to slot number ${sSlotNumber}.`;
+
+          const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+          const payload = {
+            To: driverPhoneFull,
+            From: fromNumber,
+            Body: messageBody
+          };
+
+          $.ajax({
+            url: url,
+            type: 'POST',
+            headers: {
+              'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
+            },
+            data: payload,
+            success: function (data) {
+              console.log('SMS sent successfully:', data);
+              sap.m.MessageToast.show('SMS sent successfully to the driver.');
+            },
+            error: function (xhr, status, error) {
+              console.error('Error sending SMS:', error);
+              sap.m.MessageToast.show('Failed to send SMS: ' + error);
+            }
+          });
+
+        } catch (error) {
+          console.error("Error: ", error);
+          MessageBox.error("Some technical issue");
+        }
+      },
+
       //After Assigning a slot to vehicle and clear those items...
       onClearPress: function () {
         this.getView().getModel("assignmentModel").setProperty("/", {
