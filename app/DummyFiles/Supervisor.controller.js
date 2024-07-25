@@ -647,5 +647,281 @@ sap.ui.define([
           }
         }
       },
+
+      //After Recieving a Slot request from vendors then admin can Accept or Reject, this bellow code for Acceptance...
+      onReserveSlotBtnPress: async function () {
+        try {
+          var oConfirmRequestModel = this.getView().getModel("oConfirmRequestModel").getData();
+          var oSelectedSlot = this.byId("idselectSlotReserve").getSelectedItem();
+
+          var oSlotContext = oSelectedSlot.getBindingContext().getObject();
+          var oModel = this.getView().getModel("ModelV2");
+          const oThis = this
+
+          debugger
+          oModel.update("/AllSlots(" + oSlotContext.ID + ")", { status: 'Reserved' }, {
+            success: function () {
+              sap.m.MessageToast.show("Slot Status Updated to Reserved..!!");
+            }, error: function (oError) {
+              sap.m.MessageBox.error(oError);
+            }
+          })
+
+          // Create new entry in Reserved Slots table
+          var oReservedSlotEntry = {
+            vendorName: oConfirmRequestModel.vendorName,
+            vendorNumber: oConfirmRequestModel.vendorNumber,
+            driverName: oConfirmRequestModel.driverName,
+            driverNumber: oConfirmRequestModel.driverNumber,
+            vehicleType: oConfirmRequestModel.vehicleType,
+            vehicleNumber: oConfirmRequestModel.vehicleNumber,
+            reserveSlot: {
+              ID: oSlotContext.ID,
+              slotNumber: oSlotContext.slotNumber
+            }
+          };
+
+          // Add the reserved slot entry
+          debugger
+          await new Promise((resolve, reject) => {
+            oModel.create("/ReservedSlots", oReservedSlotEntry, {
+              success: () => {
+                sap.m.MessageToast.show("Slot reserved successfully!");
+                this.getView().byId("idReservedslotsTable").getBinding("items").refresh();
+                resolve();
+              },
+              error: (oError) => {
+                sap.m.MessageBox.error(oError.message);
+                reject(oError);
+              }
+            });
+          });
+
+          //Remove That request after confirm or reject
+          var oSelectedItem = this.byId("idReservationsTable").getSelectedItem();
+          if (oSelectedItem) {
+            var sPath = oSelectedItem.getBindingContext().getPath();
+
+            // Remove the request from Reservations table
+            await new Promise((resolve, reject) => {
+              oModel.remove(sPath, {
+                success: () => {
+                  sap.m.MessageToast.show("Request removed successfully.");
+                  oThis.getView().byId("idReservationsTable").getBinding("items").refresh();
+                  resolve();
+                },
+                error: (oError) => {
+                  sap.m.MessageBox.error(oError.message);
+                  reject(oError);
+                }
+              });
+            });
+          } else {
+            sap.m.MessageToast.show("No selected request to remove.");
+          }
+
+          // Show success message
+          sap.m.MessageToast.show("Slot reserved successfully!");
+
+          // Close the dialog if needed
+          if (this.onRequestConfirmSlotDialog) {
+            this.onRequestConfirmSlotDialog.close();
+          }
+        } catch (error) {
+          sap.m.MessageBox.error("Failed to reserve slot: " + error.message);
+          console.error("Error: ", error);
+        }
+      },
+
+      //For Reject Request and delete that one...
+      onRejectConfirmSlotPress: function () {
+        var oSelectedItem = this.getView().byId("idReservationsTable").getSelectedItem();
+        if (!oSelectedItem) {
+          MessageToast.show("Please select a reservation to reject.");
+          return;
+        }
+
+        var sPath = oSelectedItem.getBindingContext().getPath();
+        var oModel = this.getView().getModel("ModelV2");
+        var oThis = this;
+
+        MessageBox.warning(
+          "Are you sure you want to Reject this RESERVATION..?",
+          {
+            actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            onClose: async function (sAction) {
+              if (sAction === MessageBox.Action.YES) {
+                try {
+                  // Remove the entry from Reservations
+                  await new Promise((resolve, reject) => {
+                    oModel.remove(sPath, {
+                      success: function () {
+                        MessageBox.success("Reservation rejected successfully.");
+                        oThis.getView().byId("idReservationsTable").getBinding("items").refresh();
+                        resolve();
+                      },
+                      error: function (oError) {
+                        MessageBox.error("Failed to reject reservation: " + oError.message);
+                        reject(oError);
+                      }
+                    });
+                  });
+                } catch (error) {
+                  MessageBox.error("An error occurred: " + error.message);
+                  console.error("Error: ", error);
+                }
+              }
+            }
+          }
+        );
+      },
+
+      //From the Reserved Slots Table Assigning the slot to vehicle..
+      //"ASSIGN Btn" (in Pop-up), Without a Msg to DriverNumber...
+      onReserveSlotConfirmAssignBtnPress: async function () {
+        debugger;
+        try {
+          const oSelectedItem = this.getView().byId("idReservedslotsTable").getSelectedItem();
+          if (!oSelectedItem) {
+            MessageToast.show("Please select a reserved slot to confirm assignment.");
+            return;
+          }
+
+          const oSelectedData = oSelectedItem.getBindingContext().getObject();
+
+          const oDriverName = this.byId("idDriverNameInput").getValue();
+          const oDriverNumber = this.byId("idMobileNumberInput").getValue();
+          const oVehicleType = this.byId("idVehTypeInput").getValue();
+          const oVehicleNumber = this.byId("idVehNumberInput").getValue();
+          const oServiceType = this.byId("idselectTransportType").getSelectedKey();
+          const oSlotNumber = this.byId("idReservedSlotInput").getValue();
+
+          const oThis = this
+          const oModel = this.getView().getModel("ModelV2");
+
+          // Validation: Check if all fields are filled
+          if (!oDriverName || !oDriverNumber || !oVehicleType || !oVehicleNumber || !oServiceType || !oSlotNumber) {
+            MessageBox.error("All fields are required.");
+            return;
+          }
+
+          // Validation: Check if driver name contains at least 4 letters
+          if (oDriverName.length < 4) {
+            this.byId("idDriverNameInput").setValueState("Error");
+            this.byId("idDriverNameInput").setValueStateText("Driver name should contain at least 4 letters.");
+            return;
+          } else {
+            this.byId("idDriverNameInput").setValueState("None");
+          }
+
+          // Validation: Check if mobile number follows the format and uniqueness
+          const mobileNumberPattern = /^[0-9]{10}$/;
+          if (!mobileNumberPattern.test(oDriverNumber)) {
+            this.byId("idMobileNumberInput").setValueState("Error");
+            this.byId("idMobileNumberInput").setValueStateText("Mobile Number should contain 10 digits.");
+            return;
+          }
+
+          // Validation: Check if vehicle number follows the format
+          const vehicleNumberPattern = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+          if (!vehicleNumberPattern.test(oVehicleNumber)) {
+            this.byId("idVehNumberInput").setValueState("Error");
+            this.byId("idVehNumberInput").setValueStateText("Vehicle Number should be in the format 'AP00AA0000'.");
+            return;
+          }
+
+          // Check if driver number already exists in Allocated Slots
+          const allocatedSlotsData = await new Promise((resolve, reject) => {
+            oModel.read("/AllocatedSlots", {
+              success: function (oData) {
+                resolve(oData.results);
+              },
+              error: function (oError) {
+                reject(oError);
+              }
+            });
+          });
+
+          const bDriverNumberExists = allocatedSlotsData.some(slot => slot.driverNumber === oDriverNumber);
+          if (bDriverNumberExists) {
+            MessageBox.error("Driver Number already Existed..!");
+            this.byId("idMobileNumberInput").setValueState("Error");
+            this.byId("idMobileNumberInput").setValueStateText("Mobile Number should be unique.");
+            return;
+          }
+
+          const bVehicleNumberExists = allocatedSlotsData.some(slot => slot.vehicleNumber === oVehicleNumber);
+          if (bVehicleNumberExists) {
+            MessageBox.error("Vehicle Number already Existed..!");
+            this.byId("idVehNumberInput").setValueState("Error");
+            this.byId("idVehNumberInput").setValueStateText("Vehicle Number should be in the format 'AP00AA0000'.");
+            return;
+          }
+
+          //New entry JSON to Allocated Slots...
+          const oNewAllocatedSlot = {
+            vehicleType: oVehicleType,
+            vehicleNumber: oVehicleNumber,
+            driverNumber: oDriverNumber,
+            driverName: oDriverName,
+            serviceType: oServiceType,
+            inTime: new Date(),
+            slotNum: {
+              ID: oSelectedData.reserveSlot.ID,
+              slotNumber: oSlotNumber
+            }
+          };
+
+          // Create a new entry in AllocatedSlots
+          await new Promise((resolve, reject) => {
+            oModel.create("/AllocatedSlots", oNewAllocatedSlot, {
+              success: () => {
+                MessageBox.success("Slot assigned successfully!");
+                resolve();
+              },
+              error: (oError) => {
+                MessageBox.error("Failed to assign slot: " + oError.message);
+                reject(oError);
+              }
+            });
+          });
+
+          // Update the slot status in AllSlots to "Occupied"
+          await new Promise((resolve, reject) => {
+            oModel.update("/AllSlots(" + oSelectedData.reserveSlot.ID + ")", { status: 'Occupied' }, {
+              success: () => {
+                MessageBox.success("Slot status changed to Occupied!");
+                resolve();
+              },
+              error: (oError) => {
+                MessageBox.error("Failed to update slot status: " + oError.message);
+                reject(oError);
+              }
+            });
+          });
+
+          //Remove That request after confirm or reject
+          const sReservedSlotPath = oSelectedItem.getBindingContext().getPath();
+          await new Promise((resolve, reject) => {
+            oModel.remove(sReservedSlotPath, {
+              success: () => {
+                MessageToast.show("Reserved slot entry removed successfully.");
+                oThis.getView().byId("idReservedslotsTable").getBinding("items").refresh();
+                resolve();
+              },
+              error: (oError) => {
+                MessageBox.error("Failed to remove reserved slot entry: " + oError.message);
+                reject(oError);
+              }
+            });
+          });
+
+          // Close the dialog
+          this.onAssignReserveSlotConfirmDialog.close();
+        } catch (error) {
+          MessageBox.error("An error occurred: " + error.message);
+          console.error("Error: ", error);
+        }
+      },
     });
   });

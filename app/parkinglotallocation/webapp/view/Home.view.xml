@@ -699,7 +699,7 @@
                                         <m:Button
                                             id="idBtnRequest"
                                             text="Confirm"
-                                            press="onRequestConfirmSlotPress"
+                                            press="onConfirmRequestSlotPress"
                                             type="Transparent"
                                         />
                                     </Toolbar>

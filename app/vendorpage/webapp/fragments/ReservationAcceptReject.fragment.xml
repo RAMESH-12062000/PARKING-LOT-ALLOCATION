@@ -1,0 +1,65 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="notificationDialog"
+        title="Reservation Details"
+        stretch="true"
+        draggable="true"
+        resizable="true"
+    >
+        <content>
+            <List
+                id="notificationList"
+                items="{
+                    path: '/ReservationAcceptReject'
+                }"
+            >
+                <CustomListItem>
+                    <VBox>
+                        <Text text="Your Reservation was successfully accepted. Here are the details:" class="successMessage" />
+
+                        <HBox>
+                        <VBox >
+                        <Avatar src="" displaySize="XS"></Avatar>
+                        </VBox>
+                            <VBox>
+                                <Text text="Your Details:" class="header" />
+                                <Text text="{vendorName}" class="details" />
+                                <Text text="{vendorNumber}" class="details" />
+                            </VBox>
+                            <VBox>
+                                <Text text="Driver Details:" class="header" />
+                                <Text text="{driverName}" class="details" />
+                                <Text text="{driverNumber}" class="details" />
+                            </VBox>
+                            <VBox>
+                                <Text text="Slot Details:" class="header" />
+                                <Text text="{slotNumber}" class="details" />
+                            </VBox>
+                        </HBox>
+                        <HBox>
+                            <VBox class="date">
+                                <Text text="{Time}" class="details" />
+                            </VBox>
+                            <VBox>
+                                <Button
+                                    icon="sap-icon://decline"
+                                    press=".onRemoveNotification"
+                                    class="removeButton"
+                                />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </CustomListItem>
+            </List>
+        </content>
+        <buttons>
+            <Button
+                text="Close"
+                press=".onCloseDialog"
+            />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

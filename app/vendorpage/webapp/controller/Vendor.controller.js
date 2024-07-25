@@ -140,7 +140,7 @@ sap.ui.define([
                     //await this.createData(oModel, oPayload1, "/Notify");
                     debugger;
                     MessageToast.show("Your details registered successfully!");
-                    //After succefully pass the test cases and create and Cleared...
+                    //After succefully pass the test cases and created and Deatails will be Cleared...
                     this.getView().byId("idVendornameInput").setValue("");
                     this.getView().byId("idVendorNumberInput").setValue("");
                     this.getView().byId("idDrivernameInput").setValue("");
@@ -176,6 +176,14 @@ sap.ui.define([
                 const oLoginContainer = this.getView().byId("idVBoxLoginContainer");
                 oLoginContainer.toggleStyleClass("slideDown");
                 oLoginContainer.toggleStyleClass("hidden");
-            }
+            },
+
+
+            onNotifyReservationsBtnPress: async function () {
+                if (!this.onNotifyAcceptRejectDialog) {
+                    this.onNotifyAcceptRejectDialog = await this.loadFragment("ReservationAcceptReject")
+                }
+                this.onNotifyAcceptRejectDialog.open();
+            },
         });
     });

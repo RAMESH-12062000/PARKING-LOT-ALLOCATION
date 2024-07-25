@@ -59,13 +59,3 @@ entity ReservedSlots {
         reserveSlot   : Association to AllSlots;
 }
 
-// entity Notify {
-//     key ID            : UUID;
-//         vendorName    : String;
-//         vendorNumber  : String;
-//         driverName    : String;
-//         driverNumber  : String;
-//         vehicleType   : String;
-//         vehicleNumber : String;
-//         inTime        : DateTime;
-// }

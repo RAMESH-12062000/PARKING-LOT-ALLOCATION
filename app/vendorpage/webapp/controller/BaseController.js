@@ -3,7 +3,7 @@ sap.ui.define(
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/Fragment"
   ],
-  function (BaseController) {
+  function (BaseController, Fragment) {
     "use strict";
 
     return BaseController.extend("com.app.vendorpage.controller.BaseController", {
@@ -11,9 +11,9 @@ sap.ui.define(
         return this.getOwnerComponent().getRouter();
       },
       loadFragment: async function (sFragmentName) {
-        const oFragment = await oFragment.load({
+        const oFragment = await Fragment.load({
           id: this.getView().getId(),
-          name: `com.app.parkinglotallocation.fragments.${sFragmentName}`,
+          name: `com.app.vendorpage.fragments.${sFragmentName}`,
           controller: this
         });
         this.getView().addDependent(oFragment);

@@ -28,6 +28,7 @@
                         type="Transparent"
                         icon="sap-icon://bell"
                         class="navButton"
+                        press="onNotifyReservationsBtnPress"
                     />
                 </HBox>
                 <HBox

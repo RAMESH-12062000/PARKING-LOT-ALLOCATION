@@ -14,7 +14,7 @@
             <Button
                 id="idReserveSlotAssignConfirm"
                 text="Assign"
-                press="onReserveSlotConfirmBtnPress"
+                press="onReserveSlotConfirmAssignBtnPress"
                 type="Transparent"
             />
         </beginButton>
