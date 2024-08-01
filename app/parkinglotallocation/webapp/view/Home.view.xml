@@ -1,4 +1,5 @@
 <mvc:View
+    xmlns:odata="sap.ui.comp.odata"
     xmlns:smarttable="sap.ui.comp.smarttable"
     controllerName="com.app.parkinglotallocation.controller.Home"
     xmlns:mvc="sap.ui.core.mvc"
@@ -8,6 +9,7 @@
     xmlns:core="sap.ui.core"
     xmlns="sap.m"
     xmlns:tnt="sap.tnt"
+    xmlns:ndc="sap.ndc"
     displayBlock="true"
     height="100%"
 >
@@ -77,6 +79,19 @@
                 </m:HBox>
 
                 <ToolbarSpacer id="IDGenToolbarSpacer2" />
+                <ndc:BarcodeScannerButton
+                    id="idQRCodeScannerBtn"
+                    scanSuccess="onScanSuccess"
+                    scanFail="onScanError"
+                    inputLiveUpdate="onScanLiveupdate"
+                    dialogTitle="Assigned Slot Details:"
+                />
+                <!-- <m:Button
+                    id="idQRCodeScannerBtn"
+                    text="Scanner"
+                    press="onQRCodeScannerPress"
+                    icon="sap-icon://qr-code"
+                /> -->
                 <Button
                     id="idReturnedBooksBtn"
                     icon="sap-icon://bell"
@@ -96,7 +111,7 @@
                     id="IDGenButton1"
                     type="Transparent"
                     tooltip="Data Visualization"
-                    icon="sap-icon://geographic-bubble-chart"
+                    icon="sap-icon://bar-chart"
                     press="onGeographicBtnPress"
                 />
                 <Button
@@ -113,6 +128,7 @@
                 id="IDGenSideNavigation1"
                 expanded="true"
                 itemSelect=".onItemSelect"
+                class="SidePanelContent"
             >
                 <tnt:NavigationList id="idnavigation">
                     <tnt:NavigationListItem
@@ -231,10 +247,11 @@
                                         text="Slot Number"
                                         required="true"
                                     />
-
-                                    <m:Select
+                                    <m:ComboBox
                                         id="idparkingLotSelect"
                                         width="80%"
+                                        placeholder="Please Select a Slot from Dropdown.. "
+                                        class="SlotNumberBold"
                                         items="{path: '/AllSlots', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}"
                                     >
                                         <core:Item
@@ -242,7 +259,7 @@
                                             key="{ID}"
                                             text="{slotNumber}"
                                         />
-                                    </m:Select>
+                                    </m:ComboBox>
                                     <Label
                                         id="IDGenLabel2"
                                         text="Driver Name"
@@ -288,7 +305,10 @@
                                         text="Service Type:"
                                         required="true"
                                     />
-                                    <m:Select id="idTypeOfDelivery">
+                                    <odata:ComboBox
+                                        id="idTypeOfDelivery"
+                                        placeholder="Please Selct Service Type from Dropdown.."
+                                    >
                                         <core:Item
                                             id="_IDGenItem234"
                                             key="InBound"
@@ -299,8 +319,7 @@
                                             key="OutBound"
                                             text="OutBound"
                                         />
-                                    </m:Select>
-
+                                    </odata:ComboBox>
                                     <HBox
                                         id="IDGenHBox2"
                                         justifyContent="End"
@@ -314,7 +333,7 @@
                                         <Button
                                             id="IDGenButton6"
                                             text="Clear"
-                                            press="onClearPress"
+                                            press="onClearSlotDetailsPress"
                                         />
                                     </HBox>
                                 </form:content>
@@ -328,6 +347,7 @@
                         horizontal="false"
                         vertical="true"
                         height="100%"
+                        width="auto"
                         class="sapUiContentPadding"
                     >
                         <m:VBox id="idVBoxallslots">
@@ -360,16 +380,28 @@
                                             id="IDGenToolbarSpacer345"
                                         />
                                         <m:Button
+                                            id="idBtnFilter"
+                                            tooltip="Filter by Status"
+                                            icon="sap-icon://filter"
+                                            press="onFilterButtonPress"
+                                        />
+                                        <m:Button
                                             id="idBtnRefresh"
                                             tooltip="Refresh"
-                                            icon="sap-icon://refresh"
+                                            icon="sap-icon://synchronize"
                                             press="onRefreshBtnPress"
+                                        />
+                                        <m:Button
+                                            id="idButtonSortingAllslots"
+                                            icon="sap-icon://sort"
+                                            press="onSortingAllSlotsTable"
+                                            tooltip="Sort"
                                         />
                                         <m:Button
                                             id="idBtnAdminLogin"
                                             tooltip="Add a New Slot"
                                             icon="sap-icon://add"
-                                            press="onCreateDialogPress"
+                                            press="onAddNewSlotPress"
                                         />
                                     </Toolbar>
                                 </form:toolbar>
@@ -382,6 +414,31 @@
                                             id="Title3"
                                             text="All Slots from the Parking Space:"
                                         />
+                                        <m:ToolbarSpacer
+                                            id="idToolbarAllSlots"
+                                        />
+                                        <m:ComboBox
+                                            id="idComboAllslots"
+                                            placeholder="Filter by Status.."
+                                            selectionChange="onFilterStatusChange"
+                                            visible="false"
+                                        >
+                                            <core:Item
+                                                id="idCoreAvaible"
+                                                key="Available"
+                                                text="Available"
+                                            />
+                                            <core:Item
+                                                id="idCoreOccupied"
+                                                key="Occupied"
+                                                text="Occupied"
+                                            />
+                                            <core:Item
+                                                id="idCoreReserved"
+                                                key="Reserved"
+                                                text="Reserved"
+                                            />
+                                        </m:ComboBox>
                                     </Toolbar>
                                     <Table
                                         id="allSlotsTable"
@@ -416,14 +473,21 @@
                                                     <Text
                                                         id="IDGenText8"
                                                         text="{slotNumber}"
+                                                        class="SlotNumberBold"
                                                     />
                                                     <Text
                                                         id="IDGenText9"
                                                         text="{serviceType}"
                                                     />
-                                                    <Text
+                                                    <!-- <Text
                                                         id="IDGenText10"
                                                         text="{status}"
+                                                    /> -->
+                                                    <ObjectStatus
+                                                        id="IDGenText11"
+                                                        text="{status}"
+                                                        class="StatusBold"
+                                                        state="{path: 'status', formatter: '.statusColorFormatter'}"
                                                     />
                                                 </cells>
                                             </ColumnListItem>
@@ -472,8 +536,13 @@
                                         <m:Button
                                             id="idBtnRefreshAllocated"
                                             tooltip="Refresh"
-                                            icon="sap-icon://refresh"
-                                            press="onRefreshBtnPressAllocated"
+                                            icon="sap-icon://synchronize"
+                                            press="onRefresAllocated"
+                                        />
+                                        <m:Button
+                                            id="idSortBtnAllocatedSlots"
+                                            icon="sap-icon://sort"
+                                            press="onSortBtnAllocatedSlots"
                                         />
                                         <m:SearchField
                                             id="idSearchFieldAllocated"
@@ -587,6 +656,7 @@
                                                         <Text
                                                             id="IDGenText01"
                                                             text="{slotNum/slotNumber}"
+                                                            class="SlotNumberBold"
                                                             visible="true"
                                                         />
                                                         <ComboBox
@@ -594,6 +664,7 @@
                                                             items="{path: '/AllSlots',filters: [{ path: 'status', operator: 'EQ', value1: 'Available' }], templateShareable:true}"
                                                             visible="false"
                                                             placeholder="Select Slot"
+                                                            class="SlotNumberBold"
                                                         >
                                                             <core:Item
                                                                 id="idcoreitemselct"
@@ -690,6 +761,11 @@
                                         />
                                         <ToolbarSpacer id="IDGenToolbar345" />
                                         <m:Button
+                                            id="idRefrehshBtnReservations"
+                                            press="onRefreshReservations"
+                                            icon="sap-icon://synchronize"
+                                        />
+                                        <m:Button
                                             id="idBtnReject"
                                             text="Reject"
                                             press="onRejectConfirmSlotPress"
@@ -712,6 +788,15 @@
                                         <Title
                                             id="Title5"
                                             text="Request for a Slot from Vendors:"
+                                        />
+                                        <m:ToolbarSpacer
+                                            id="idtoolBarReservations"
+                                        />
+                                        <m:SearchField
+                                            id="idSearchFieldFromReservations"
+                                            liveChange="onLiveSearchReservationsPress"
+                                            placeholder="Search Anything..."
+                                            width="25%"
                                         />
                                     </Toolbar>
                                     <Table
@@ -849,6 +934,12 @@
                                             tooltip="ReservedSlotConfirm"
                                             icon="sap-icon://activity-assigned-to-goal"
                                         />
+                                        <m:Button
+                                            id="idButtonSortingReservedSlots"
+                                            icon="sap-icon://sort"
+                                            press="onSortingAllTablesBySlotNumber"
+                                            tooltip="Sort"
+                                        />
                                     </Toolbar>
                                 </form:toolbar>
                                 <form:content>
@@ -859,6 +950,15 @@
                                         <Title
                                             id="Title2345"
                                             text="You declared a Slot for Vendor:"
+                                        />
+                                        <m:ToolbarSpacer
+                                            id="idToolBarReservesedSlots"
+                                        />
+                                        <m:SearchField
+                                            id="idSearchFieldFromReservedSlots"
+                                            liveChange="onLiveSearchReservedSlotsPress"
+                                            placeholder="Search Anything..."
+                                            width="25%"
                                         />
                                     </Toolbar>
                                     <Table
@@ -935,6 +1035,7 @@
                                                     <Text
                                                         id="IDGenReserveText5"
                                                         text="{reserveSlot/slotNumber}"
+                                                        class="SlotNumberBold"
                                                     />
                                                     <Text
                                                         id="IDGenReserveText6"
@@ -994,11 +1095,23 @@
                                             width="30%"
                                             placeholder="Search Anything..."
                                         /> -->
+                                        <m:Button
+                                            id="idBtnRefershHistory"
+                                            tooltip="Refresh"
+                                            icon="sap-icon://synchronize"
+                                            press="onRefreshBtnTotalHistoryTable"
+                                        />
+                                        <m:Button
+                                            id="idButtonSortingHistory"
+                                            icon="sap-icon://sort"
+                                            press="onSortingHistoryTable"
+                                            tooltip="Sort"
+                                        />
                                         <m:SearchField
                                             id="idSearchField"
                                             liveChange="onLiveSearchAnythingPress"
                                             placeholder="Search Anything..."
-                                            width="30%"
+                                            width="25%"
                                         />
                                     </Toolbar>
                                 </form:toolbar>
@@ -1066,6 +1179,7 @@
                                                     <Text
                                                         id="IDGenHistoryText8"
                                                         text="{slotNumber}"
+                                                        class="SlotNumberBold"
                                                     />
                                                     <Text
                                                         id="IDGenHistoryText9"
@@ -1119,7 +1233,7 @@
                     >
                         <m:Image
                             id="IdImageright"
-                            src="./Images/image(5).jpeg"
+                            src="./Images/imageArtihcus (1) copy.jpg"
                             width="100%"
                             height="auto"
                         />

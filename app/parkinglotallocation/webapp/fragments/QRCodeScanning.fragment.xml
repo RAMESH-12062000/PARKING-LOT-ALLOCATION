@@ -1,0 +1,80 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+>
+    <Dialog
+        id="idQRCodeScannerDialog"
+        resizable="false"
+        draggable="true"
+        contentWidth="30%"
+        class="dialogSlideDown"
+        title="After QR Code Scanning:"
+    >
+        <beginButton>
+            <Button
+                id="idQRCodeScannerUnAssignButton"
+                text="UnAssign"
+                press="onUnAssignQRCodePress"
+                type="Transparent"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                id="idCancelQRCodeButton"
+                text="Cancel"
+                press="onCloseQRCodeScanningPress"
+                type="Transparent"
+            />
+        </endButton>
+        <content>
+            <form:SimpleForm
+                id="idQRCodeScannerForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false"
+            >
+                <Label
+                    id="idLableTitleQRCode"
+                    text="Slot Number"
+                />
+                <Input
+                    id="idTitleInputQRCodeSlot"
+                    required="true"
+                    placeholder="Enter New Slot Number.."
+                    value=""
+                />
+                <Label
+                    id="idDriverNumberQRcode"
+                    text="Driver Number"
+                />
+                <Input
+                    id="idQRCodescanningDriverNo"
+                    required="true"
+                    placeholder="Please Enter Driver Number.."
+                />
+                <Label
+                    id="idVehicleNumberQRcode"
+                    text="Vehicle Number"
+                />
+                <Input
+                    id="idQRCodescanningVehicleNumber"
+                    required="true"
+                    placeholder="Please Enter Vehicle Number.."
+                />
+            </form:SimpleForm>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

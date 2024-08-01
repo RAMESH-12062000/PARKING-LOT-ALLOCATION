@@ -519,6 +519,32 @@ sap.ui.define([
         }
       },
 
+      /* This Bellow functionality is from Allocated Slots and you need add Method called "oBinding.filter([])" yo need add this one in Refresh btn function,
+      then only it Crossmark(*) works.. */
+      onLiveSearchAllocatedPress: function (oEvent) {
+        var sQuery = oEvent.getSource().getValue();
+        var aFilters = [];
+
+        if (sQuery && sQuery.length > 0) {
+          var filterSlotNumber = new Filter("slotNum/slotNumber", FilterOperator.Contains, sQuery);
+          var filtervehType = new Filter("vehicleType", FilterOperator.Contains, sQuery);
+          var filtervehNumber = new Filter("vehicleNumber", FilterOperator.Contains, sQuery);
+          var filterdriverNumber = new Filter("driverNumber", FilterOperator.Contains, sQuery);
+          var filterdriverName = new Filter("driverName", FilterOperator.Contains, sQuery);
+          var filterServiceType = new Filter("serviceType", FilterOperator.Contains, sQuery);
+
+          var allFilter = new Filter({
+            filters: [filterSlotNumber, filtervehType, filtervehNumber, filterdriverNumber, filterdriverName, filterServiceType],
+            and: false
+          });
+          aFilters.push(allFilter);
+
+          var oList = this.byId("AllocatedSlotsTable");
+          var oBinding = oList.getBinding("items");
+          oBinding.filter(allFilter);
+        }
+      },
+
       //Search anything from History Table...
       onLiveSearchAnythingPress: function (oEvent) {
         var sQuery = oEvent.getParameter("newValue");
@@ -923,5 +949,48 @@ sap.ui.define([
           console.error("Error: ", error);
         }
       },
+
+      //this is second way to print the slip..
+      //this.printAssignmentDetails(oPayload);
+
+
+      printAssignmentDetails: function (oPayload) {
+        var SlotNumber = this.getView().byId("idparkingLotSelect").mProperties.value;
+        // Generate barcode data
+        var barcodeData = `Vehicle Number: ${oPayload.vehicleNumber}`;
+        // Create a new window for printing
+        var printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Slot Assigned Details</title > ');
+        printWindow.document.write('<style>');
+        printWindow.document.write('body { font-family: Arial, sansserif; }');
+        printWindow.document.write('.details-table { width: 100%; border - collapse: collapse;}');
+        printWindow.document.write('.details-table th, .details-table td { border: 1px solid #000; padding: 8px; text- align: left;}');
+        printWindow.document.write('.details-table th { backgroundcolor: #f2f2f2; }');
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<div class="print-container">');
+        printWindow.document.write('<h1>Parking-Slot Assigned Details Slip:</h1 > ');
+        printWindow.document.write('</div>');
+        printWindow.document.write('<table class="details-table">');
+        printWindow.document.write('<tr><th>Field</th><th>Details</th></tr > ');
+        printWindow.document.write('<tr><td>Parking Slot Number</td><td>' + SlotNumber + '</td></tr>');
+        printWindow.document.write('<tr><td>Driver Name</td><td>' + oPayload.driverName + '</td></tr>');
+        printWindow.document.write('<tr><td>Driver Number</td><td>' + oPayload.driverNumber + '</td></tr>');
+        printWindow.document.write('<tr><td>Vehicle Type</td><td>' + oPayload.vehicleType + '</td></tr>');
+        printWindow.document.write('<tr><td>Vehicle Number</td><td>' + oPayload.vehicleNumber + '</td></tr>');
+        printWindow.document.write('<tr><td>Service Type</td><td>' + oPayload.serviceType + '</td></tr>');
+        printWindow.document.write('</table>');
+        printWindow.document.write('<div class="barcodecontainer"><svg id="barcode"></svg></div>');
+        // Include JsBarcode library
+        printWindow.document.write('<script src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js" > </script > ');
+        printWindow.document.write('<script>JsBarcode("#barcode", "' + barcodeData + '");</script>');
+        printWindow.document.write('</div>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.focus();
+        // Print the contents of the new window
+        printWindow.print();
+      },
+
     });
   });

@@ -64,19 +64,19 @@ sap.ui.define([
                 var sVehicleType = this.getView().byId("idVehTypeInput").getValue();
                 var sVehicleNumber = this.getView().byId("idVehNumberInput").getValue();
                 var oThis = this;
-            
+
                 // Validate all required fields
                 if (!sVendorName || !sVendorNumber || !sDriverName || !sDriverNumber || !sVehicleType || !sVehicleNumber) {
                     MessageBox.error("All fields are required.");
                     return;
                 }
-            
+
                 // Validate name length
                 if (sVendorName.length < 4 || sDriverName.length < 4) {
                     MessageBox.error("Vendor and Driver names must contain at least 4 letters.");
                     return;
                 }
-            
+
                 // Validate phone numbers and vehicle number
                 if (!/^\d{10}$/.test(sVendorNumber)) {
                     this.getView().byId("idVendorNumberInput").setValueState("Error").setValueStateText("Mobile number must be a '10-digit number'.");
@@ -84,32 +84,32 @@ sap.ui.define([
                 } else {
                     this.getView().byId("idVendorNumberInput").setValueState("None");
                 }
-            
+
                 if (!/^\d{10}$/.test(sDriverNumber)) {
                     this.getView().byId("idDriverNumberInput").setValueState("Error").setValueStateText("Mobile number must be a '10-digit number'.");
                     return;
                 } else {
                     this.getView().byId("idDriverNumberInput").setValueState("None");
                 }
-            
+
                 if (!/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/.test(sVehicleNumber)) {  // Example format: XX00XX0000
                     this.getView().byId("idVehNumberInput").setValueState("Error").setValueStateText("Vehicle number format Should be like this 'AP09AA1234'.");
                     return;
                 } else {
                     this.getView().byId("idVehNumberInput").setValueState("None");
                 }
-            
+
                 // Check if vendor mobile number, driver mobile number, or vehicle number already exists
                 var oModel = this.getView().getModel("ModelV2");
                 var bVendorNumberExists = await this.checkIfExists(oModel, "/Reservations", "vendorNumber", sVendorNumber);
                 var bDriverNumberExists = await this.checkIfExists(oModel, "/Reservations", "driverNumber", sDriverNumber);
                 var bVehicleNumberExists = await this.checkIfExists(oModel, "/Reservations", "vehicleNumber", sVehicleNumber);
-            
+
                 if (bVendorNumberExists || bDriverNumberExists || bVehicleNumberExists) {
                     MessageBox.error("Vendor number, driver number, or vehicle number already exists.");
                     return;
                 }
-            
+
                 const reservationModel = new sap.ui.model.json.JSONModel({
                     vendorName: sVendorName,
                     vendorNumber: sVendorNumber,
@@ -128,18 +128,18 @@ sap.ui.define([
                 //     vehicleNumber: sVehicleNumber,
                 //     inTime: new Date().toISOString()
                 // });
-            
+
                 this.getView().setModel(reservationModel, "reservationModel");
                 //this.getView().setModel(notifyModel, "notifyModel");
                 const oPayload = this.getView().getModel("reservationModel").getProperty("/");
                 //const oPayload1 = this.getView().getModel("notifyModel").getProperty("/");
                 console.log("Payload: ", oPayload);
-            
+
                 try {
                     await this.createData(oModel, oPayload, "/Reservations");
                     //await this.createData(oModel, oPayload1, "/Notify");
                     debugger;
-                    MessageToast.show("Your details registered successfully!");
+                    MessageBox.success("Your details registered successfully..!");
                     //After succefully pass the test cases and created and Deatails will be Cleared...
                     this.getView().byId("idVendornameInput").setValue("");
                     this.getView().byId("idVendorNumberInput").setValue("");
@@ -170,14 +170,33 @@ sap.ui.define([
             onCancelPress: function () {
                 // Clear button functionality
             },
-              
+
             //If click on the Book a slot function then a Pop-up slowly appear...
             onBookSlotPress: function () {
-                const oLoginContainer = this.getView().byId("idVBoxLoginContainer");
-                oLoginContainer.toggleStyleClass("slideDown");
-                oLoginContainer.toggleStyleClass("hidden");
+                var oLoginContainer = this.byId("idVBoxLoginContainer");
+                var oMainContainer = this.byId("idVBoxMain");
+                var oDescriptionContainer = this.byId("idVBoxDescription");
+    
+                if (oLoginContainer.hasStyleClass("hidden")) {
+                    oLoginContainer.removeStyleClass("hidden");
+                    oLoginContainer.addStyleClass("slideDown");
+                    oLoginContainer.addStyleClass("rightAligned");
+    
+                    oMainContainer.removeStyleClass("centered");
+                    oMainContainer.addStyleClass("leftAligned");
+    
+                    oDescriptionContainer.addStyleClass("leftAligned");
+                } else {
+                    oLoginContainer.addStyleClass("hidden");
+                    oLoginContainer.removeStyleClass("slideDown");
+                    oLoginContainer.removeStyleClass("rightAligned");
+    
+                    oMainContainer.removeStyleClass("leftAligned");
+                    oMainContainer.addStyleClass("centered");
+    
+                    oDescriptionContainer.removeStyleClass("leftAligned");
+                }
             },
-
 
             onNotifyReservationsBtnPress: async function () {
                 if (!this.onNotifyAcceptRejectDialog) {

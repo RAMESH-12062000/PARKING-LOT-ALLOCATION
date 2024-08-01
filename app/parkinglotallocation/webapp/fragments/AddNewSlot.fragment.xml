@@ -1,0 +1,82 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+>
+    <Dialog
+        id="dialog1"
+        resizable="false"
+        draggable="true"
+        contentWidth="30%"
+        class="dialogSlideDown"
+        title="Add a new Slot to Parking Space:"
+    >
+        <beginButton>
+            <Button
+                id="idCreateaddslotButton"
+                text="+Slot"
+                press="onNewSlotAddingPress"
+                type="Success"
+            />
+        </beginButton>
+        <endButton>
+            <Button
+                id="idCanceladdslotButton"
+                text="Cancel"
+                press="onCloseaddslotDialog"
+                type="Negative"
+            />
+        </endButton>
+        <content>
+            <form:SimpleForm
+                id="idBookDetailsForm"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+                singleContainerFullSize="false"
+            >
+                <Label
+                    id="idLableTitle"
+                    text="Slot Number"
+                />
+                <Input
+                    id="idTitleInput"
+                    required="true"
+                    placeholder="Enter New Slot Number.."
+                />
+
+                <Label
+                    id="idLableServiceType"
+                    text="Service Type"
+                />
+                <ComboBox
+                    id="idComboboxAddslot"
+                    placeholder="Please select Service Type from Dropdown.."
+                    required="true"
+                >
+                    <core:Item
+                        id="idCoreItemInBound"
+                        key="InBound"
+                        text="InBound"
+                    />
+                    <core:Item
+                        id="idCoreItemOutBound"
+                        key="OutBound"
+                        text="OutBound"
+                    />
+                </ComboBox>
+            </form:SimpleForm>
+        </content>
+    </Dialog>
+</core:FragmentDefinition>

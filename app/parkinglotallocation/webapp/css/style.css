@@ -25,13 +25,14 @@
     margin: auto;
     margin-top: 13rem;
 }
-.TextParkingLot{
+
+.TextParkingLot {
     color: aliceblue;
     font-size: x-large;
     font-style: oblique;
 }
 
-.ParkingSubtitle{
+.ParkingSubtitle {
     color: aqua;
     font-size: medium;
     font-style: normal;
@@ -55,37 +56,45 @@
 }
 
 
-.HeaderName{
+.HeaderName {
     margin: auto;
     font-size: medium;
     font-weight: bolder;
 }
 
 
-.AssignClearSpace{
+.AssignClearSpace {
     margin-right: 0.5rem;
 }
 
-
-
-/* .RadioButtons{
-    margin-right: 2rem; 
+.SidePanelContent {
+    background-image: url('https://img.freepik.com/premium-photo/harbors-parking-area-accommodates-array-parked-trucks-vertical-mobile-wallpaper_896558-15728.jpg?w=360') !important;
+    width: 20%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.StatusBold {
+    font-size: medium;
+    font-weight: 550;
 }
 
-.InwardBtn{
-    margin-right: 0.5rem;
-} */
+.SlotNumberBold {
+    font-weight: 550;
+}
 
-.UnAssignBtn{
+
+.UnAssignBtn {
     margin: auto;
-    margin-left:  1rem;
+    margin-left: 1rem;
 }
 
-.sapUiContentPadding1234{
+.sapUiContentPadding1234 {
     background-image: url('https://i.postimg.cc/tJLGFNF9/image-6.jpg');
 }
 
-.Sidenavigation{
+.Sidenavigation {
     background-color: blue;
 }
 
@@ -112,6 +121,29 @@
     }
 }
 
-.reservationrejectbtn{
-    color: red;
+.reservationrejectbtn {
+    color: red !important;
+}
+
+.SlipSlotDetails {
+    font-weight: 550;
+}
+
+.InPutDetailsQRCode {
+    font-weight: 550;
+}
+
+/* Add a New Slot to the Parking Space Animation */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.dialogSlideDown {
+    animation: slideDown 0.5s forwards;
 }

@@ -31,9 +31,9 @@
                         press="onNotifyReservationsBtnPress"
                     />
                 </HBox>
-                <HBox
-                    id="idHBoxMain"
-                    class="mainContainer"
+                <VBox
+                    id="idVBoxMain"
+                    class="mainContainer centered"
                     justifyContent="Center"
                     alignItems="Center"
                 >
@@ -151,12 +151,11 @@
                                         type="Transparent"
                                         press="onCancelPress"
                                     />
-                                    <!-- <Button id="idButtonSignUp" text="Sign Up" type="Transparent" press="onSignUp"/> -->
                                 </HBox>
                             </content>
                         </Panel>
                     </VBox>
-                </HBox>
+                </VBox>
             </VBox>
         </Page>
     </App>

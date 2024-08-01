@@ -6,14 +6,19 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageBox",
-    "sap/m/MessageToast"
+    "sap/m/MessageToast",
+    "sap/ui/core/Fragment"
 ],
-    function (Device, Controller, JSONModel, Filter, FilterOperator, MessageBox, MessageToast) {
+    function (Device, Controller, JSONModel, Filter, FilterOperator, MessageBox, MessageToast, Fragment) {
         "use strict";
 
         return Controller.extend("com.app.parkinglotallocation.controller.Home", {
 
             onInit: function () {
+                // var oModel = new JSONModel(sap.ui.require.toUrl("com/app/parkinglotallocation/model/data.json"));
+                // this.getView().setModel(oModel);
+                // this._setToggleButtonTooltip(!Device.system.desktop);
+
                 //AllSlots Data Visuals...
                 this._setParkingLotModel();
 
@@ -29,10 +34,30 @@ sap.ui.define([
                 var oSupervisorModel = new JSONModel(oSupervisorData);
                 this.getView().setModel(oSupervisorModel, "supervisor");
 
-                var oReservedSlotsModel = new JSONModel({
-                    ReservedSlots: []
-                });
-                this.getView().setModel(oReservedSlotsModel, "reservedSlotsModel");
+                // var oReservedSlotsModel = new JSONModel({
+                //     ReservedSlots: []
+                // });
+                // this.getView().setModel(oReservedSlotsModel, "reservedSlotsModel");
+            },
+
+            //if click on menu btn then opens side bar..
+            onSideNavButtonPress: function () {
+                var oToolPage = this.byId("toolPage");
+                var bSideExpanded = oToolPage.getSideExpanded();
+
+                this._setToggleButtonTooltip(bSideExpanded);
+
+                oToolPage.setSideExpanded(!oToolPage.getSideExpanded());
+            },
+
+            //Tooltp msgs for menu btn when cursor moveing on the Menu Btn... 
+            _setToggleButtonTooltip: function (bLarge) {
+                var oToggleButton = this.byId('sideNavigationToggleButton');
+                if (bLarge) {
+                    oToggleButton.setTooltip('Large Size Navigation');
+                } else {
+                    oToggleButton.setTooltip('Small Size Navigation');
+                }
             },
 
             //For settings button in Slot Assignment...
@@ -316,36 +341,37 @@ sap.ui.define([
                 this.byId("cancelButton").setVisible(false);
             },
 
-            //if click on menu btn then opens side bar..
-            onSideNavButtonPress: function () {
-                var oToolPage = this.byId("toolPage");
-                var bSideExpanded = oToolPage.getSideExpanded();
-
-                this._setToggleButtonTooltip(bSideExpanded);
-
-                oToolPage.setSideExpanded(!oToolPage.getSideExpanded());
-            },
-
-            //Tooltp msgs for menu btn when cursor moveing on the Menu Btn... 
-            _setToggleButtonTooltip: function (bLarge) {
-                var oToggleButton = this.byId('sideNavigationToggleButton');
-                if (bLarge) {
-                    oToggleButton.setTooltip('Large Size Navigation');
-                } else {
-                    oToggleButton.setTooltip('Small Size Navigation');
-                }
-            },
-
             //Refresh Btn in AllSlots Table
             onRefreshBtnPress: function () {
+                var oTable = this.getView().byId("allSlotsTable");
+                var oBinding = oTable.getBinding("items");
+                var oComboBox = this.getView().byId("idComboAllslots");
+                // Clear the selection in the ComboBox
+                oComboBox.setSelectedKey(null);
+                // Clear the filter on the table binding to show all items
+                oBinding.filter([]);
+                //Refresh the Table...
                 this.getView().byId("allSlotsTable").getBinding("items").refresh();
             },
             //Refresh Btn in AllocatedSlots Table
-            onRefreshBtnPressAllocated: function () {
-                this.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
+            onRefresAllocated: function () {
+                var oTable = this.getView().byId("AllocatedSlotsTable");
+                var oBinding = oTable.getBinding("items");
+                oBinding.filter([]);
+                oBinding.refresh();
+            },
+            //Refresh Btn in Reservations Table
+            onRefreshReservations: function () {
+                this.getView().byId("idReservationsTable").getBinding("items").filter([]);
+                this.getView().byId("idReservationsTable").getBinding("items").refresh();
+            },
+            //Refresh Btn in History Table
+            onRefreshBtnTotalHistoryTable: function () {
+                this.getView().byId("idHistoryTable").getBinding("items").filter([]);
+                this.getView().byId("idHistoryTable").getBinding("items").refresh();
             },
 
-            //Assign a slot to vehicle...
+            //Assign a slot to vehicle...(1st window)
             onAssignSlotPress: async function () {
                 debugger;
                 var sSlotNumber = this.getView().byId("idparkingLotSelect").getSelectedKey();
@@ -354,10 +380,12 @@ sap.ui.define([
                 var sDriverNumber = this.getView().byId("iddriverNumber").getValue();
                 var sDriverName = this.getView().byId("iddriverName").getValue();
                 var sServiceType = this.getView().byId("idTypeOfDelivery").getSelectedKey();
+                var oThis = this;
 
                 var valid = true;
                 if (!sSlotNumber) {
                     this.getView().byId("idparkingLotSelect").setValueState(sap.ui.core.ValueState.Error);
+                    this.getView().byId("idparkingLotSelect").setValueStateText("Select Slot from 'Dropdown'");
                     valid = false;
                 } else {
                     this.getView().byId("idparkingLotSelect").setValueState(sap.ui.core.ValueState.None);
@@ -407,23 +435,53 @@ sap.ui.define([
                     return;
                 }
 
-                const assignmentModel = new sap.ui.model.json.JSONModel({
-                    vehicleType: sVehicleType,
-                    vehicleNumber: sVehicleNumber,
-                    driverNumber: sDriverNumber,
-                    driverName: sDriverName,
-                    serviceType: sServiceType,
-                    inTime: new Date().toISOString(),
-                    slotNum_ID: sSlotNumber // Ensure the association is correctly set
-                });
-
-                this.getView().setModel(assignmentModel, "assignmentModel");
-                const oPayload = this.getView().getModel("assignmentModel").getProperty("/");
                 const oModel = this.getView().getModel("ModelV2");
 
-                console.log("Payload: ", oPayload);
-
                 try {
+                    // Check if vehicle number or driver number already exist in Allocated Slots
+                    const allocatedSlotsData = await new Promise((resolve, reject) => {
+                        oModel.read("/AllocatedSlots", {
+                            success: function (oData) {
+                                resolve(oData.results);
+                            },
+                            error: function (oError) {
+                                reject(oError);
+                            }
+                        });
+                    });
+
+                    const bVehicleNumberExists = allocatedSlotsData.some(slot => slot.vehicleNumber === sVehicleNumber);
+                    const bDriverNumberExists = allocatedSlotsData.some(slot => slot.driverNumber === sDriverNumber);
+
+                    if (bVehicleNumberExists) {
+                        MessageBox.error("Vehicle Number already exists.");
+                        this.getView().byId("idvehicleNumber").setValueState(sap.ui.core.ValueState.Error);
+                        this.getView().byId("idvehicleNumber").setValueStateText("Vehicle Number should be unique.");
+                        return;
+                    }
+
+                    if (bDriverNumberExists) {
+                        MessageBox.error("Driver Number already exists.");
+                        this.getView().byId("iddriverNumber").setValueState(sap.ui.core.ValueState.Error);
+                        this.getView().byId("iddriverNumber").setValueStateText("Driver Number should be unique.");
+                        return;
+                    }
+
+                    // If no duplicates are found, proceed with the assignment
+                    const assignmentModel = new sap.ui.model.json.JSONModel({
+                        vehicleType: sVehicleType,
+                        vehicleNumber: sVehicleNumber,
+                        driverNumber: sDriverNumber,
+                        driverName: sDriverName,
+                        serviceType: sServiceType,
+                        inTime: new Date().toISOString(),
+                        slotNum_ID: sSlotNumber // Ensure the association is correctly set
+                    });
+
+                    this.getView().setModel(assignmentModel, "assignmentModel");
+                    const oPayload = this.getView().getModel("assignmentModel").getProperty("/");
+                    //console.log("Payload: ", oPayload);
+
                     // Create the assignment in AllocatedSlots
                     await this.createData(oModel, oPayload, "/AllocatedSlots");
 
@@ -441,7 +499,8 @@ sap.ui.define([
                                     oModel.update(sSlotPath, oSlotData, {
                                         success: function () {
                                             MessageToast.show("Slot status updated to 'Occupied'.");
-                                            this.getView().byId("allSlotsTable").getBinding("items").refresh(); // Refresh the model to get the latest data
+                                            oThis.getView().byId("allSlotsTable").getBinding("items").refresh(); // Refresh the model to get the latest data
+                                            oThis.getView().byId("idparkingLotSelect").getBinding("items").refresh(); // Refresh the model to get the latest data
                                             resolve();
                                         }.bind(this),
                                         error: function (oError) {
@@ -451,62 +510,60 @@ sap.ui.define([
                                     });
                                 });
 
-                                // Fetch slot number for the SMS
-                                const sSlotIDFilter = new sap.ui.model.Filter("ID", sap.ui.model.FilterOperator.EQ, sSlotNumber);
-                                await new Promise((resolve, reject) => {
-                                    oModel.read("/AllSlots", {
-                                        filters: [sSlotIDFilter],
-                                        success: function (oData) {
-                                            if (oData.results.length > 0) {
-                                                var oSlotDetails = oData.results[0];
-                                                var slotNumberForSMS = oSlotDetails.slotNumber; // Assume 'slotNumber' is the actual slot number field
-                                                resolve(slotNumberForSMS);
-                                            } else {
-                                                MessageBox.error("Slot details not found.");
-                                                reject("Slot details not found");
-                                            }
-                                        },
-                                        error: function (oError) {
-                                            MessageBox.error("Failed to fetch slot details: " + oError.message);
-                                            reject(oError);
-                                        }
-                                    });
-                                }).then(async (slotNumberForSMS) => {
-                                    // Send SMS to driver
-                                    var driverPhoneFull = "+91" + sDriverNumber;
+                                // // Fetch slot number for the SMS
+                                // const sSlotIDFilter = new sap.ui.model.Filter("ID", sap.ui.model.FilterOperator.EQ, sSlotNumber);
+                                // await new Promise((resolve, reject) => {
+                                //     oModel.read("/AllSlots", {
+                                //         filters: [sSlotIDFilter],
+                                //         success: function (oData) {
+                                //             if (oData.results.length > 0) {
+                                //                 var oSlotDetails = oData.results[0];
+                                //                 var slotNumberForSMS = oSlotDetails.slotNumber; // Assume 'slotNumber' is the actual slot number field
+                                //                 resolve(slotNumberForSMS);
+                                //             } else {
+                                //                 MessageBox.error("Slot details not found.");
+                                //                 reject("Slot details not found");
+                                //             }
+                                //         },
+                                //         error: function (oError) {
+                                //             MessageBox.error("Failed to fetch slot details: " + oError.message);
+                                //             reject(oError);
+                                //         }
+                                //     });
+                                // }).then(async (slotNumberForSMS) => {
+                                //     // Send SMS to driver
+                                //     var driverPhoneFull = "+91" + sDriverNumber;
 
-                                    // Twilio API credentials
-                                    const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
-                                    const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
-                                    const fromNumber = '+16187243098';
+                                //     // Twilio API credentials
+                                //     const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
+                                //     const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
+                                //     const fromNumber = '+16187243098';
 
-                                    const messageBody = `Hello ${sDriverName}, \n\nPlease park your Vehicle at the following slot: \n\nVehicle Number:${sVehicleNumber} \nSlot Number:${slotNumberForSMS} \n\nThank you.`;
+                                //     const messageBody = `Hello ${sDriverName}, \n\nPlease park your Vehicle at the following slot:\nVehicle Number:${sVehicleNumber} \nSlot Number:${slotNumberForSMS} \n\nThank you.\nBest regards,\nArtihcus Pvt Ltd.`;
 
-                                    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+                                //     const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
-                                    const payload = {
-                                        To: driverPhoneFull,
-                                        From: fromNumber,
-                                        Body: messageBody
-                                    };
+                                //     const payload = {
+                                //         To: driverPhoneFull,
+                                //         From: fromNumber,
+                                //         Body: messageBody
+                                //     };
 
-                                    $.ajax({
-                                        url: url,
-                                        type: 'POST',
-                                        headers: {
-                                            'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
-                                        },
-                                        data: payload,
-                                        success: function (data) {
-                                            console.log('SMS sent successfully:', data);
-                                            sap.m.MessageToast.show('SMS sent successfully to the driver.');
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error sending SMS:', error);
-                                            sap.m.MessageToast.show('Failed to send SMS: ' + error);
-                                        }
-                                    });
-                                });
+                                //     $.ajax({
+                                //         url: url,
+                                //         type: 'POST',
+                                //         headers: { 'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken) },
+                                //         data: payload,
+                                //         success: function (data) {
+                                //             //console.log('SMS sent successfully:', data);
+                                //             sap.m.MessageBox.success('SMS sent successfully to the Driver..!');
+                                //         },
+                                //         error: function (xhr, status, error) {
+                                //             //console.error('Error sending SMS:', error);
+                                //             sap.m.MessageToast.show('Failed to send SMS: ' + error);
+                                //         }
+                                //     });
+                                // });
                             } else {
                                 MessageBox.error("Slot not found.");
                             }
@@ -535,10 +592,46 @@ sap.ui.define([
                             console.log('Sorry, your browser does not support the Web Speech API.');
                         }
                     }
-
-                    // Example usage
+                    // Example usage Voice
                     makeAnnouncement(`कृपया ध्यान दें। वाहन नंबर ${sVehicleNumber} को स्लॉट नंबर ${sSlotNumber} द्वारा आवंटित किया गया है।`, 'hi-IN');
                     makeAnnouncement(`దయచేసి వినండి. వాహనం నంబర్ ${sVehicleNumber} కు స్లాట్ నంబర్ ${sSlotNumber} కేటాయించబడింది.`, 'te-IN');
+
+                    //Generating the Barcode data and Slot Details Slip... 
+                    var SlotNumber = this.getView().byId("idparkingLotSelect").mProperties.value;
+                    // Generate barcode data for this only
+                    var barcodeData = `Vehicle Number: ${oPayload.vehicleNumber}`;
+                    // Create a new window for printing
+                    var printWindow = window.open('', '', 'height=600,width=800');
+                    printWindow.document.write('<html><head><title>Assigned Slot Details Slip:</title > ');
+                    printWindow.document.write('<style>');
+                    printWindow.document.write('body { font-family: Arial, sansserif; }');
+                    printWindow.document.write('.details-table { width: 100%; border - collapse: collapse;}');
+                    printWindow.document.write('.details-table th, .details-table td { border: 1px solid #000; padding: 8px; text- align: left;}');
+                    printWindow.document.write('.details-table th { backgroundcolor: #f2f2f2; }');
+                    printWindow.document.write('</style>');
+                    printWindow.document.write('</head><body>');
+                    printWindow.document.write('<div class="print-container">');
+                    printWindow.document.write('<h1>Parking-Slot Assigned Details Slip:</h1 > ');
+                    printWindow.document.write('</div>');
+                    printWindow.document.write('<table class="details-table">');
+                    printWindow.document.write('<tr><th>Property</th><th>Details</th></tr > ');
+                    printWindow.document.write('<tr><td>Parking Slot Number</td><td>' + SlotNumber + '</td></tr>');
+                    printWindow.document.write('<tr><td>Driver Name</td><td>' + oPayload.driverName + '</td></tr>');
+                    printWindow.document.write('<tr><td>Driver Number</td><td>' + oPayload.driverNumber + '</td></tr>');
+                    printWindow.document.write('<tr><td>Vehicle Type</td><td>' + oPayload.vehicleType + '</td></tr>');
+                    printWindow.document.write('<tr><td>Vehicle Number</td><td>' + oPayload.vehicleNumber + '</td></tr>');
+                    printWindow.document.write('<tr><td>Service Type</td><td>' + oPayload.serviceType + '</td></tr>');
+                    printWindow.document.write('</table>');
+                    printWindow.document.write('<div class="barcodecontainer"><svg id="barcode"></svg></div>');
+                    // Include JsBarcode library
+                    printWindow.document.write('<script src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js" > </script > ');
+                    printWindow.document.write('<script>JsBarcode("#barcode", "' + barcodeData + '");</script>');
+                    printWindow.document.write('</div>');
+                    printWindow.document.write('</body></html>');
+                    printWindow.document.close();
+                    printWindow.focus();
+                    // Print the contents of the new window
+                    printWindow.print();
 
                     // Refresh the tables
                     this.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
@@ -549,11 +642,20 @@ sap.ui.define([
                     this.getView().byId("iddriverNumber").setValue("");
                     this.getView().byId("iddriverName").setValue("");
                     this.getView().byId("idTypeOfDelivery").setSelectedKey("");
-                    MessageToast.show("Slot Assigned Successfully!");
                 } catch (error) {
                     console.error("Error assigning slot: ", error);
                     MessageBox.error("Failed to assign slot: " + error.message);
                 }
+            },
+
+            //Clearing the You Enterd Deatils..
+            onClearSlotDetailsPress: function () {
+                this.getView().byId("idparkingLotSelect").setSelectedKey("");
+                this.getView().byId("idvehicleNumber").setValue("");
+                this.getView().byId("idvehicleType").setValue("");
+                this.getView().byId("iddriverNumber").setValue("");
+                this.getView().byId("iddriverName").setValue("");
+                this.getView().byId("idTypeOfDelivery").setSelectedKey("");
             },
 
             //Un Assign the slot after the vehical leavs the Parking Space...
@@ -567,7 +669,7 @@ sap.ui.define([
                 const oThis = this;
 
                 MessageBox.confirm(
-                    `Are you sure you want to unassign slot '${oAllocatedData.slot_ID}'?`,
+                    `Are you sure you want to Unassign slot '${oAllocatedData.slotNum.slotNumber}'?`,
                     {
                         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
                         onClose: async function (sAction) {
@@ -608,7 +710,8 @@ sap.ui.define([
                                     oModel.update("/AllSlots(" + slotStatus + ")", { status: 'Available' }, {
                                         success: function () {
                                             sap.m.MessageToast.show("Slot Status Updated in Available..!!");
-                                            this.getView().byId("allSlotsTable").getBinding("items").refresh();
+                                            oThis.getView().byId("allSlotsTable").getBinding("items").refresh();
+                                            oThis.getView().byId("idparkingLotSelect").getBinding("items").refresh();
                                         }, error: function (oError) {
                                             sap.m.MessageBox.error(oError);
                                         }
@@ -626,31 +729,168 @@ sap.ui.define([
                 );
             },
 
-            //Search anything from AllocatedSlots Table...(this way also works fine)
-            onLiveSearchAllocatedPress: function (oEvent) {
-                var sQuery = oEvent.getSource().getValue();
-                var aFilters = [];
+            //Add a new Slot to Parking Space...
+            onAddNewSlotPress: async function () {
+                if (!this.onAddNewSlotDialog) {
+                    this.onAddNewSlotDialog = await this.loadFragment("AddNewSlot")
+                }
+                this.onAddNewSlotDialog.open()
+            },
+            onNewSlotAddingPress: async function () {
+                var oView = this.getView();
+                var sSlotNumber = oView.byId("idTitleInput").getValue();
+                var sServiceType = oView.byId("idComboboxAddslot").getSelectedKey();
+                var oThis = this;
 
-                if (sQuery && sQuery.length > 0) {
-                    var filterSlotNumber = new Filter("slotNum/slotNumber", FilterOperator.Contains, sQuery);
-                    var filtervehType = new Filter("vehicleType", FilterOperator.Contains, sQuery);
-                    var filtervehNumber = new Filter("vehicleNumber", FilterOperator.Contains, sQuery);
-                    var filterdriverNumber = new Filter("driverNumber", FilterOperator.Contains, sQuery);
-                    var filterdriverName = new Filter("driverName", FilterOperator.Contains, sQuery);
-                    var filterServiceType = new Filter("serviceType", FilterOperator.Contains, sQuery);
+                // Validate required fields
+                if (!sSlotNumber || !sServiceType) {
+                    MessageBox.error("All fields are required.");
+                    return;
+                }
+                // Validate slot number format
+                if (!/^PSlot\d{3}$/.test(sSlotNumber)) {
+                    oView.byId("idTitleInput").setValueState("Error").setValueStateText("Slot number format should be 'PSlot<3Digits(0-9)>'.");
+                    return;
+                } else {
+                    oView.byId("idTitleInput").setValueState("None");
+                }
+                // Check if slot number already exists
+                var oModel = this.getView().getModel("ModelV2");
+                var bSlotNumberExists = await this.checkIfExists(oModel, "/AllSlots", "slotNumber", sSlotNumber);
+                if (bSlotNumberExists) {
+                    MessageBox.error("Slot number already exists.");
+                    return;
+                }
+                // Create new slot
+                var oPayload = {
+                    slotNumber: sSlotNumber,
+                    serviceType: sServiceType,
+                    status: "Available"
+                };
 
-                    var allFilter = new Filter({
-                        filters: [filterSlotNumber, filtervehType, filtervehNumber, filterdriverNumber, filterdriverName, filterServiceType],
-                        and: false
+                try {
+                    await this.createData(oModel, oPayload, "/AllSlots");
+                    MessageBox.success("New slot added successfully.");
+                    // Clear the input fields after successful creation
+                    oView.byId("idTitleInput").setValue("");
+                    oView.byId("idComboboxAddslot").setSelectedKey("");
+                } catch (error) {
+                    console.error("Error: ", error);
+                    MessageBox.error("Some technical issue occurred.");
+                }
+                this.onAddNewSlotDialog.close();
+                // Refresh the AllSlots table
+                this.getView().byId("allSlotsTable").getBinding("items").refresh();
+            },
+            checkIfExists: function (oModel, sEntitySet, sProperty, sValue) {
+                return new Promise((resolve, reject) => {
+                    oModel.read(sEntitySet, {
+                        filters: [new sap.ui.model.Filter(sProperty, sap.ui.model.FilterOperator.EQ, sValue)],
+                        success: (oData) => {
+                            resolve(oData.results.length > 0);
+                        },
+                        error: (oError) => {
+                            reject(oError);
+                        }
                     });
-                    aFilters.push(allFilter);
+                });
+            },
+            //Closing for Add a New Slot Dialog..
+            onCloseaddslotDialog: function () {
+                this.onAddNewSlotDialog.close();
+            },
 
-                    var oList = this.byId("AllocatedSlotsTable");
-                    var oBinding = oList.getBinding("items");
-                    oBinding.filter(allFilter);
+            //Filter By Status only...(AllSlots Table)
+            onFilterButtonPress: function () {
+                var oComboBox = this.byId("idComboAllslots");
+                var bVisible = oComboBox.getVisible();
+                oComboBox.setVisible(!bVisible);
+            },
+            onFilterStatusChange: function (oEvent) {
+                var sSelectedKey = oEvent.getParameter("selectedItem").getKey();
+                var oTable = this.byId("allSlotsTable");
+                var oBinding = oTable.getBinding("items");
+
+                if (sSelectedKey) {
+                    var aFilters = [];
+                    aFilters.push(new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, sSelectedKey));
+                    oBinding.filter(aFilters);
                 }
             },
 
+            //Search anything from AllocatedSlots Table...(this way also works fine)
+            onLiveSearchAllocatedPress: function (oEvent) {
+                var sQuery = oEvent.getParameter("newValue");
+                var aFilters = [];
+
+                if (sQuery && sQuery.length > 0) {
+                    aFilters.push(new Filter("slotNum/slotNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vehicleType", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vehicleNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("driverNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("driverName", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("serviceType", FilterOperator.Contains, sQuery));
+
+                    var oFinalFilter = new Filter({
+                        filters: aFilters,
+                        and: false
+                    });
+
+                    this.getView().byId("AllocatedSlotsTable").getBinding("items").filter(oFinalFilter);
+                } else {
+                    this.getView().byId("AllocatedSlotsTable").getBinding("items").filter([]);
+                }
+            },
+
+
+            //Search fields in Reservations Table...
+            onLiveSearchReservationsPress: function (oEvent) {
+                var sQuery = oEvent.getParameter("newValue");
+                var aFilters = [];
+
+                if (sQuery && sQuery.length > 0) {
+                    aFilters.push(new Filter("vendorName", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vendorNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vehicleType", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vehicleNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("driverNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("driverName", FilterOperator.Contains, sQuery));
+
+                    var oFinalFilter = new Filter({
+                        filters: aFilters,
+                        and: false
+                    });
+
+                    this.getView().byId("idReservationsTable").getBinding("items").filter(oFinalFilter);
+                } else {
+                    this.getView().byId("idReservationsTable").getBinding("items").filter([]);
+                }
+            },
+
+            //Search field In Reserved Slots Table...
+            onLiveSearchReservedSlotsPress: function (oEvent) {
+                var sQuery = oEvent.getParameter("newValue");
+                var aFilters = [];
+
+                if (sQuery && sQuery.length > 0) {
+                    aFilters.push(new Filter("reserveSlot/slotNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vendorName", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vendorNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vehicleType", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("vehicleNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("driverNumber", FilterOperator.Contains, sQuery));
+                    aFilters.push(new Filter("driverName", FilterOperator.Contains, sQuery));
+
+                    var oFinalFilter = new Filter({
+                        filters: aFilters,
+                        and: false
+                    });
+
+                    this.getView().byId("idReservedslotsTable").getBinding("items").filter(oFinalFilter);
+                } else {
+                    this.getView().byId("idReservedslotsTable").getBinding("items").filter([]);
+                }
+            },
             //Search anything from History Table...
             onLiveSearchAnythingPress: function (oEvent) {
                 var sQuery = oEvent.getParameter("newValue");
@@ -712,39 +952,37 @@ sap.ui.define([
                                     });
 
                                     // Retrieve vendor number from the selected item
-                                    debugger
-                                    var oContext = oSelectedItem.getBindingContext().getObject();
-                                    var vendorPhoneFull = "+91" + oContext.vendorNumber;
-                                    var messageBody = `Your Request for Slot was Rejected.\n\nDear Vendor,\n\nWe regret to inform you that there are no available slots in the parking space at the moment. We apologize for any inconvenience this may cause. Please try again after some time.\n\nThank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
+                                    //debugger
+                                    // var oContext = oSelectedItem.getBindingContext().getObject();
+                                    // var vendorPhoneFull = "+91" + oContext.vendorNumber;
+                                    // var messageBody = `Your Request for Slot was Rejected.\n\nDear Vendor,\n\nWe regret to inform you that there are no available slots in the parking space at the moment. We apologize for any inconvenience this may cause. Please try again after some time.\n\nThank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
 
-                                    // Send SMS to vendor
-                                    const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
-                                    const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
-                                    const fromNumber = '+16187243098';
-                                    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+                                    // // Send SMS to vendor
+                                    // const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
+                                    // const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
+                                    // const fromNumber = '+16187243098';
+                                    // const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
-                                    const payload = {
-                                        To: vendorPhoneFull,
-                                        From: fromNumber,
-                                        Body: messageBody
-                                    };
+                                    // const payload = {
+                                    //     To: vendorPhoneFull,
+                                    //     From: fromNumber,
+                                    //     Body: messageBody
+                                    // };
 
-                                    await $.ajax({
-                                        url: url,
-                                        type: 'POST',
-                                        headers: {
-                                            'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
-                                        },
-                                        data: payload,
-                                        success: function (data) {
-                                            console.log('SMS sent successfully:', data);
-                                            sap.m.MessageToast.show('SMS sent successfully to the vendor.');
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error('Error sending SMS:', error);
-                                            sap.m.MessageToast.show('Failed to send SMS: ' + error);
-                                        }
-                                    });
+                                    // await $.ajax({
+                                    //     url: url,
+                                    //     type: 'POST',
+                                    //     headers: { 'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken) },
+                                    //     data: payload,
+                                    //     success: function (data) {
+                                    //         //console.log('SMS sent successfully:', data);
+                                    //         sap.m.MessageToast.show('SMS sent successfully to the vendor.');
+                                    //     },
+                                    //     error: function (xhr, status, error) {
+                                    //         //console.error('Error sending SMS:', error);
+                                    //         sap.m.MessageToast.show('Failed to send SMS: ' + error);
+                                    //     }
+                                    // });
 
                                 } catch (error) {
                                     MessageBox.error("An error occurred: " + error.message);
@@ -833,8 +1071,10 @@ sap.ui.define([
                     await new Promise((resolve, reject) => {
                         oModel.create("/ReservedSlots", oReservedSlotEntry, {
                             success: () => {
-                                sap.m.MessageToast.show("Slot reserved successfully!");
+                                sap.m.MessageBox.success("Slot reserved successfully..!");
                                 oView.byId("idReservedslotsTable").getBinding("items").refresh();
+                                oThis.getView().byId("idselectSlotReserve").getBinding("items").refresh();
+                                oThis.getView().byId("allSlotsTable").getBinding("items").refresh();
                                 resolve();
                             },
                             error: (oError) => {
@@ -845,43 +1085,41 @@ sap.ui.define([
                     });
 
                     // Send SMS to vendor with the reservation details
-                    debugger
-                    const vendorPhoneFull = "+91" + oConfirmRequestModel.vendorNumber;
-                    const messageBody = `Hello, Your request for a slot was accepted. \n\nDear Vendor,\n\nThank you for your request. We're pleased to inform you that we have successfully Reserved a slot for you. Here are the details of your reserved slot:
-Driver Name: ${oConfirmRequestModel.driverName},
-Driver Number: ${oConfirmRequestModel.driverNumber},
-Vehicle Number: ${oConfirmRequestModel.vehicleNumber},
-Slot Number: ${sNewSlotNumber}.
-Please send your truck to our warehouse.\n
-Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
+                    //debugger
+                    //                     const vendorPhoneFull = "+91" + oConfirmRequestModel.vendorNumber;
+                    //                     const messageBody = `Hello, Your request for a slot was accepted. \n\nDear Vendor,\n\nThank you for your request. We're pleased to inform you that we have successfully Reserved a slot for you. Here are the details of your reserved slot:
+                    // Driver Name: ${oConfirmRequestModel.driverName},
+                    // Driver Number: ${oConfirmRequestModel.driverNumber},
+                    // Vehicle Number: ${oConfirmRequestModel.vehicleNumber},
+                    // Slot Number: ${sNewSlotNumber}.
+                    // Please send your truck to our warehouse.\n
+                    // Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
 
-                    const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
-                    const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
-                    const fromNumber = '+16187243098';
-                    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+                    //                     const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
+                    //                     const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
+                    //                     const fromNumber = '+16187243098';
+                    //                     const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
-                    const payload = {
-                        To: vendorPhoneFull,
-                        From: fromNumber,
-                        Body: messageBody
-                    };
+                    //                     const payload = {
+                    //                         To: vendorPhoneFull,
+                    //                         From: fromNumber,
+                    //                         Body: messageBody
+                    //                     };
 
-                    await $.ajax({
-                        url: url,
-                        type: 'POST',
-                        headers: {
-                            'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
-                        },
-                        data: payload,
-                        success: function (data) {
-                            //console.log('SMS sent successfully:', data);
-                            sap.m.MessageBox.success('SMS sent successfully to the vendor, Please cross check once..!');
-                        },
-                        error: function (xhr, status, error) {
-                            //console.error('Error sending SMS:', error);
-                            sap.m.MessageToast.show('Failed to send SMS: ' + error);
-                        }
-                    });
+                    //                     await $.ajax({
+                    //                         url: url,
+                    //                         type: 'POST',
+                    //                         headers: { 'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken) },
+                    //                         data: payload,
+                    //                         success: function (data) {
+                    //                             //console.log('SMS sent successfully:', data);
+                    //                             sap.m.MessageBox.success('SMS sent successfully to the vendor, Please cross check once..!');
+                    //                         },
+                    //                         error: function (xhr, status, error) {
+                    //                             //console.error('Error sending SMS:', error);
+                    //                             sap.m.MessageToast.show('Failed to send SMS: ' + error);
+                    //                         }
+                    //                     });
 
                     // Remove the confirmed or rejected request from the Reservations table
                     debugger
@@ -1079,6 +1317,7 @@ Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
                         oModel.create("/AllocatedSlots", oNewAllocatedSlot, {
                             success: () => {
                                 sap.m.MessageBox.success("Slot assigned successfully!");
+                                oThis.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
                                 resolve();
                             },
                             error: (oError) => {
@@ -1094,6 +1333,7 @@ Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
                         oModel.update("/AllSlots(" + oSelectedData.reserveSlot.ID + ")", { status: 'Occupied' }, {
                             success: () => {
                                 sap.m.MessageBox.success("Slot status changed to Occupied!");
+                                oThis.getView().byId("allSlotsTable").getBinding("items").refresh();
                                 resolve();
                             },
                             error: (oError) => {
@@ -1104,36 +1344,36 @@ Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
                     });
 
                     // Send SMS to driver
-                    const driverPhoneFull = "+91" + oDriverNumber;
-                    const messageBody = `Hello ${oDriverName},\n\nPlease park your vehicle at the following slot:\nSlot Number: ${oSlotNumber} \nVehicle Number: ${oVehicleNumber}\n\nThank you.\nBest regards,\nArithcus Global Pvt Ltd.`;
+                    // const driverPhoneFull = "+91" + oDriverNumber;
+                    // const messageBody = `Hello ${oDriverName},\n\nPlease park your vehicle at the following slot:\nSlot Number: ${oSlotNumber} \nVehicle Number: ${oVehicleNumber}\n\nThank you.\nBest regards,\nArithcus Global Pvt Ltd.`;
 
-                    const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
-                    const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
-                    const fromNumber = '+16187243098';
-                    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+                    // const accountSid = 'AC9418cec2d41b4131132454d424d9f90c';
+                    // const authToken = '328ec7413f4a2e353a72b9b3bed216b7';
+                    // const fromNumber = '+16187243098';
+                    // const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
-                    const payload = {
-                        To: driverPhoneFull,
-                        From: fromNumber,
-                        Body: messageBody
-                    };
+                    // const payload = {
+                    //     To: driverPhoneFull,
+                    //     From: fromNumber,
+                    //     Body: messageBody
+                    // };
 
-                    await $.ajax({
-                        url: url,
-                        type: 'POST',
-                        headers: {
-                            'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
-                        },
-                        data: payload,
-                        success: function (data) {
-                            console.log('SMS sent successfully:', data);
-                            sap.m.MessageToast.show('SMS sent successfully to the driver.');
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error sending SMS:', error);
-                            sap.m.MessageToast.show('Failed to send SMS: ' + error);
-                        }
-                    });
+                    // await $.ajax({
+                    //     url: url,
+                    //     type: 'POST',
+                    //     headers: {
+                    //         'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken)
+                    //     },
+                    //     data: payload,
+                    //     success: function (data) {
+                    //         console.log('SMS sent successfully:', data);
+                    //         sap.m.MessageToast.show('SMS sent successfully to the driver.');
+                    //     },
+                    //     error: function (xhr, status, error) {
+                    //         console.error('Error sending SMS:', error);
+                    //         sap.m.MessageToast.show('Failed to send SMS: ' + error);
+                    //     }
+                    // });
 
                     // Remove the reserved slot entry after confirming assignment
                     const sReservedSlotPath = oSelectedItem.getBindingContext().getPath();
@@ -1151,7 +1391,6 @@ Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
                             }
                         });
                     });
-
                     // Close the dialog
                     this.onAssignReserveSlotConfirmDialog.close();
                 } catch (error) {
@@ -1199,6 +1438,7 @@ Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
                 }
                 this.onDatavisualizationDialog.open();
             },
+            //Having one calling method in Init Function...(for this only)
             _setParkingLotModel: function () {
                 // Fetch data from OData service
                 var oModel = this.getOwnerComponent().getModel("ModelV2");
@@ -1238,11 +1478,232 @@ Thank you for choosing us.\n\nBest regards,\nArtihcus Global Pvt Ltd.`;
                 });
             },
 
+
+
+            // onScanSuccess: function (oEvent) {
+            //     if (oEvent.getParameter("cancelled")) {
+            //         MessageToast.show("Scan cancelled", { duration: 1000 });
+            //     } else {
+            //         const vehicleNumber = oEvent.getParameter("text");
+            //         if (vehicleNumber) {
+            //             MessageBox.confirm(
+            //                 `Are you sure you want to unassign the slot for vehicle number '${vehicleNumber}'?`,
+            //                 {
+            //                     actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+            //                     onClose: async function (sAction) {
+            //                         if (sAction === MessageBox.Action.YES) {
+            //                             try {
+            //                                 await this._unassignSlotByVehicleNumber(vehicleNumber);
+            //                                 MessageToast.show("Slot unassigned successfully.");
+            //                             } catch (error) {
+            //                                 MessageBox.error("Failed to unassign slot or add to history.");
+            //                                 console.error("Error: ", error);
+            //                             }
+            //                         }
+            //                     }.bind(this)
+            //                 }
+            //             );
+            //         } else {
+            //             MessageToast.show("No data found in barcode.");
+            //         }
+            //     }
+            // },
+
+
+            // _unassignSlotByVehicleNumber: async function (vehicleNumber) {
+            //     const oModel = this.getView().getModel("ModelV2");
+
+            //     // Retrieve the slot data based on the vehicle number
+            //     const sFilter = new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, vehicleNumber);
+            //     const slotData = await new Promise((resolve, reject) => {
+            //         oModel.read("/AllocatedSlots", {
+            //             filters: [sFilter],
+            //             success: function (oData) {
+            //                 resolve(oData.results[0]); // Assuming vehicleNumber is unique
+            //             },
+            //             error: function (oError) {
+            //                 reject(oError);
+            //             }
+            //         });
+            //     });
+
+            //     if (!slotData) {
+            //         throw new Error("No allocated slot found for the vehicle number.");
+            //     }
+
+            //     // Remove the entry from AllocatedSlots
+            //     const sPath = `/AllocatedSlots(${slotData.ID})`;
+            //     await new Promise((resolve, reject) => {
+            //         oModel.remove(sPath, {
+            //             success: function () {
+            //                 resolve();
+            //             },
+            //             error: function (oError) {
+            //                 reject(oError);
+            //             }
+            //         });
+            //     });
+
+            //     // Create a new entry in TotalHistory
+            //     const oHistoryPayload = {
+            //         vehicleType: slotData.vehicleType,
+            //         vehicleNumber: slotData.vehicleNumber,
+            //         driverNumber: slotData.driverNumber,
+            //         driverName: slotData.driverName,
+            //         serviceType: slotData.serviceType,
+            //         inTime: slotData.inTime,
+            //         outTime: new Date().toISOString(),
+            //         slotNumber: slotData.slotNum.slotNumber
+            //     };
+
+            //     await new Promise((resolve, reject) => {
+            //         oModel.create("/TotalHistory", oHistoryPayload, {
+            //             success: function () {
+            //                 resolve();
+            //             },
+            //             error: function (oError) {
+            //                 reject(oError);
+            //             }
+            //         });
+            //     });
+
+            //     // Update the slot status in All Slots to "Available"
+            //     const sSlotPath = `/AllSlots(${slotData.slotNum.ID})`;
+            //     await new Promise((resolve, reject) => {
+            //         oModel.update(sSlotPath, { status: 'Available' }, {
+            //             success: function () {
+            //                 resolve();
+            //             },
+            //             error: function (oError) {
+            //                 reject(oError);
+            //             }
+            //         });
+            //     });
+
+            //     // Refresh the tables
+            //     //this.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
+            //     //this.getView().byId("idHistoryTable").getBinding("items").refresh();
+            //     //this.getView().byId("allSlotsTable").getBinding("items").refresh();
+            // },
+
+
+            onScanSuccess: async function (oEvent) {
+                debugger;
+                if (oEvent.getParameter("cancelled")) {
+                    MessageToast.show("Scan cancelled", { duration: 1000 });
+                } else {
+                    var VehicleNumber = oEvent.getParameter("text");
+
+                    var sVehicleNumber = VehicleNumber.split(':').pop().trim();
+
+                    if (sVehicleNumber) {
+                        // Fetch the model
+                        var oModel = this.getView().getModel("ModelV2");
+                        var oThis = this;
+
+                        // Find the allocated slot using the vehicle number
+                        try {
+                            const allocatedSlotData = await new Promise((resolve, reject) => {
+                                debugger;
+                                oModel.read("/AllocatedSlots", {
+                                    filters: [new sap.ui.model.Filter("vehicleNumber", sap.ui.model.FilterOperator.EQ, sVehicleNumber)],
+                                    success: function (oData) {
+                                        resolve(oData.results);
+                                    },
+                                    error: function (oError) {
+                                        reject(oError);
+                                    }
+                                });
+                            });
+
+                            const oAllocatedData = allocatedSlotData[0]; // Assuming only one slot per vehicle number
+
+                            MessageBox.confirm(
+                                `Are you sure you want to unassign slot for vehicle '${sVehicleNumber}'?`,
+                                {
+                                    actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                                    onClose: async function (sAction) {
+                                        if (sAction === MessageBox.Action.YES) {
+                                            try {
+                                                // Remove the entry from AllocatedSlots
+                                                const sKey = oModel.createKey("/AllocatedSlots", { ID: oAllocatedData.ID });
+
+                                                // Remove the entry from AllocatedSlots
+                                                await new Promise((resolve, reject) => {
+                                                    oModel.remove(sKey, {
+                                                        success: resolve,
+                                                        error: reject
+                                                    });
+                                                });
+
+                                                //Add entry to History table
+                                                const oHistoryPayload = {
+                                                    vehicleType: oAllocatedData.vehicleType,
+                                                    vehicleNumber: oAllocatedData.vehicleNumber,
+                                                    driverNumber: oAllocatedData.driverNumber,
+                                                    driverName: oAllocatedData.driverName,
+                                                    serviceType: oAllocatedData.serviceType,
+                                                    inTime: oAllocatedData.inTime,
+                                                    outTime: new Date().toISOString(),
+                                                    slotNumber: oAllocatedData.ID
+                                                };
+
+                                                await new Promise((resolve, reject) => {
+                                                    debugger
+                                                    oModel.create("/TotalHistory", oHistoryPayload, {
+                                                        success: resolve,
+                                                        error: reject
+                                                    });
+                                                });
+
+                                                // Update the slot status in All Slots table
+                                                const sSlotPath = `/AllSlots(${oAllocatedData.slotNum.ID})`;
+                                                debugger
+                                                await new Promise((resolve, reject) => {
+                                                    oModel.update(sSlotPath, { status: 'Available' }, {
+                                                        success: resolve,
+                                                        error: reject
+                                                    });
+                                                });
+
+                                                sap.m.MessageToast.show("Slot status updated to 'Available'.");
+
+                                                // Refresh the tables
+                                                //oThis.getView().byId("AllocatedSlotsTable").getBinding("items").refresh();
+                                                //oThis.getView().byId("idHistoryTable").getBinding("items").refresh();
+                                                //oThis.getView().byId("allSlotsTable").getBinding("items").refresh();
+                                                //oThis.getView().byId("idparkingLotSelect").getBinding("items").refresh();
+
+                                            } catch (error) {
+                                                MessageBox.error("Failed to unassign slot or add to history.");
+                                                console.error("Error: ", error);
+                                            }
+                                        }
+                                    }
+                                }
+                            );
+                        } catch (error) {
+                            MessageBox.error("Error finding allocated slot: " + error.message);
+                        }
+                    }
+                }
+            },
+
+
+
+
+
+
+
+
             //for closing Pie Chart for Data visualization...
             onClosePiechartDialog: function () {
                 if (this.onDatavisualizationDialog) {
                     this.onDatavisualizationDialog.close();
                 }
+            },
+            onRefresh: function () {
+                this.getView().getModel("ModelV2").refresh(true);
             },
         });
     });
