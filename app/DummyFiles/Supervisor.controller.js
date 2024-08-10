@@ -675,6 +675,38 @@ sap.ui.define([
       },
 
       //After Recieving a Slot request from vendors then admin can Accept or Reject, this bellow code for Acceptance...
+      // onConfirmRequestSlotPress: async function () {
+      //     var oSelected = this.byId("idReservationsTable").getSelectedItem();
+      //     if (oSelected) {
+      //         debugger
+      //         var oID = oSelected.getBindingContext().getObject().ID
+      //         var oVendorName = oSelected.getBindingContext().getObject().vendorName
+      //         var oVendorNumber = oSelected.getBindingContext().getObject().vendorNumber
+      //         var oDriverName = oSelected.getBindingContext().getObject().driverName
+      //         var oDriverNumber = oSelected.getBindingContext().getObject().driverNumber
+      //         var oVehicleType = oSelected.getBindingContext().getObject().vehicleType
+      //         var oVehicleNumebr = oSelected.getBindingContext().getObject().vehicleNumber
+      //         var oServiceType = oSelected.getBindingContext().getObject().serviceType
+
+      //         const oConfirmRequestModel = new JSONModel({
+      //             ID: oID,
+      //             vendorName: oVendorName,
+      //             vendorNumber: oVendorNumber,
+      //             driverName: oDriverName,
+      //             driverNumber: oDriverNumber,
+      //             vehicleType: oVehicleType,
+      //             vehicleNumber: oVehicleNumebr,
+      //             serviceType: oServiceType
+      //         });
+      //         this.getView().setModel(oConfirmRequestModel, "oConfirmRequestModel");
+      //         if (!this.onRequestConfirmSlotDialog) {
+      //             this.onRequestConfirmSlotDialog = await this.loadFragment("ReserveSlot")
+      //         }
+      //         this.onRequestConfirmSlotDialog.open();
+      //     } else {
+      //         MessageToast.show("Please Select a Vendor to Confirm A Slot Reservation..!")
+      //     }
+      // },
       onReserveSlotBtnPress: async function () {
         try {
           var oConfirmRequestModel = this.getView().getModel("oConfirmRequestModel").getData();

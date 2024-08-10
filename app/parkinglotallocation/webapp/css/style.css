@@ -75,6 +75,7 @@
     background-position: center;
     background-repeat: no-repeat;
 }
+
 .StatusBold {
     font-size: medium;
     font-weight: 550;
@@ -121,8 +122,41 @@
     }
 }
 
-.reservationrejectbtn {
+.LeftSidePanelTextColor{
+    color: darkblue;
+    background-color: white;
+}
+.LeftSidePanelTextColor{
+    color: darkblue;
+}
+
+.reservationrejectbtn,
+.CancelBtnFromAllocatedSlots {
+    background-color: white !important;
     color: red !important;
+}
+.confirmReservationBtn, 
+.AssignBtnfromReservedSlots,
+.SaveBtnFromAllocatedSlots {
+    background-color: white !important;
+    color: green !important;
+}
+
+/* To ensure the text color is applied, you might need to use this selector */
+.reservationrejectbtn .sapMBtnText {
+    color: rgb(204, 5, 5) !important;
+}
+.CancelBtnFromAllocatedSlots .sapMBtnText {
+    color: rgb(204, 5, 5) !important;
+}
+.confirmReservationBtn .sapMBtnText {
+    color: green!important;
+}
+.AssignBtnfromReservedSlots .sapMBtnText {
+    color: green!important;
+}
+.SaveBtnFromAllocatedSlots .sapMBtnText {
+    color: green!important;
 }
 
 .SlipSlotDetails {
@@ -146,4 +180,23 @@
 
 .dialogSlideDown {
     animation: slideDown 0.5s forwards;
+}
+
+.sapMLIBSelected,
+.sapMLIB:hover,
+.sapMLIBFocused {
+    background-color: rgba(24, 126, 241, 0.342) !important;
+}
+
+.RightSideContent {
+    background-image: url('https://th.bing.com/th/id/OIP.3Qpqm7H3dJp4QUNXCEWmzQAAAA?rs=1&pid=ImgDetMain') !important;
+}
+
+.DatavisualPARKINGLOT {
+    margin-top: 1rem;
+    margin-left: 1rem;
+}
+
+.HedingNameColor {
+    color: rgb(219, 3, 68) !important; /* Pink color for the header names */
 }

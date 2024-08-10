@@ -55,6 +55,15 @@
                     value="{oConfirmReservedSlotModel>/slotNumber}"
                 />
                 <Label
+                    id="idLableSlotNum14305"
+                    text="Service Type"
+                />
+                <Input
+                    id="idServiceTypeForVendor"
+                    editable="false"
+                    value="{oConfirmReservedSlotModel>/serviceType}"
+                />
+                <Label
                     id="idLableDriverName14301"
                     text="Driver Name"
                 />
@@ -87,25 +96,6 @@
                     id="idVehNumberInput"
                     value="{oConfirmReservedSlotModel>/vehicleNumber}"
                 />
-                <Label
-                    id="idLableSlotNum14305"
-                    text="Transpost Type:"
-                />
-                <Select
-                    id="idselectTransportType"
-                    width="40%"
-                >
-                    <core:Item
-                        id="idCoreSelectinBound"
-                        key="InBound"
-                        text="InBound"
-                    />
-                    <core:Item
-                        id="idCoreSelectOutBound"
-                        key="OutBound"
-                        text="OutBound"
-                    />
-                </Select>
             </form:SimpleForm>
         </content>
     </Dialog>

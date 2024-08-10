@@ -64,6 +64,44 @@ sap.ui.define(
         // Apply the sorter to the binding..
         oBinding.sort(oSorter);
       },
+
+      onFilterButtonPress: function () {
+        var oComboBox = this.byId("idComboAllslots");
+        var bVisible = oComboBox.getVisible();
+        oComboBox.setVisible(!bVisible);
+      },
+
+      //Filter by Status and Service Type...
+      onFilterStatusChange: function (oEvent) {
+        var sSelectedKey = oEvent.getParameter("selectedItem").getKey();
+        var oTable = this.byId("allSlotsTable");
+        var oBinding = oTable.getBinding("items");
+
+        var aFilters = [];
+        if (sSelectedKey === "Available" || sSelectedKey === "Occupied" || sSelectedKey === "Reserved") {
+          aFilters.push(new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, sSelectedKey));
+        } else if (sSelectedKey === "InBound" || sSelectedKey === "OutBound") {
+          aFilters.push(new sap.ui.model.Filter("serviceType", sap.ui.model.FilterOperator.EQ, sSelectedKey));
+        }
+        oBinding.filter(aFilters);
+      },
+
+      //Filtered Available slots based on Service Type...
+      onServiceTypeChange: function (oEvent) {
+        var sServiceType = oEvent.getSource().getSelectedKey();
+        var oSlotsComboBox = this.getView().byId("idparkingLotSelect");
+
+        if (sServiceType) {
+          var aFilters = [
+            new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, "Available"),
+            new sap.ui.model.Filter("serviceType", sap.ui.model.FilterOperator.EQ, sServiceType)
+          ];
+          oSlotsComboBox.getBinding("items").filter(aFilters);
+        } else {
+          oSlotsComboBox.getBinding("items").filter([]);
+        }
+      }
+
     });
   }
 );

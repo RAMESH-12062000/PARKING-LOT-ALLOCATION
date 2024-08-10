@@ -44,6 +44,7 @@ entity Reservations {
         driverNumber  : String;
         vehicleType   : String;
         vehicleNumber : String;
+        serviceType   : String;
         inTime        : DateTime;
 
 }
@@ -56,6 +57,6 @@ entity ReservedSlots {
         driverNumber  : String;
         vehicleType   : String;
         vehicleNumber : String;
+        serviceType   : String;
         reserveSlot   : Association to AllSlots;
 }
-

@@ -15,9 +15,14 @@
         contentWidth="70%"
         contentHeight="70%"
     >
+        <Title
+            id="idTitlebar"
+            text="PARKING LOT MANAGEMENT:"
+            class="DatavisualPARKINGLOT"
+        />
         <endButton>
             <Button
-                id="idbtn"
+                id="idbtnCloseDataVisualsGraph"
                 text="Close"
                 press="onClosePiechartDialog"
             />
@@ -31,30 +36,37 @@
                     <suite:ChartContainerContent id="chartContainerContent">
                         <suite:content>
                             <viz:VizFrame
-                                id="idpiechart"
+                                id="idbarchart"
                                 width="auto"
                                 uiConfig="{applicationSet:'fiori'}"
-                                vizType="pie"
+                                vizType="column"
                                 vizProperties="{
-                                plotArea: {dataLabel: {visible: true}},title: {text:'PARKING LOT MANAGEMENT:'}}"
+                                    plotArea: {dataLabel: {visible: true}},
+                                    title: {text:'Parking Lot Status:'},
+                                    colorPalette: ['#4CAF50', '#F82A2C', '#FF9800'],
+                                    legend: {
+                                        visible: true,
+                                        title: 'Status'
+                                    }
+                                }"
                                 selectData="myOnClickHandler"
                                 renderComplete="handleRenderComplete"
                             >
                                 <viz:dataset>
                                     <viz.data:FlattenedDataset
-                                        id="flattenData"
+                                        id="idFlattenedDataset"
                                         data="{ParkingLotModel>/Items}"
                                     >
                                         <viz.data:dimensions>
                                             <viz.data:DimensionDefinition
-                                                id="_IDGenDimensionDefinition1"
-                                                name="status"
+                                                id="idDimensionDefinition"
+                                                name="Status"
                                                 value="{ParkingLotModel>status}"
                                             />
                                         </viz.data:dimensions>
                                         <viz.data:measures>
                                             <viz.data:MeasureDefinition
-                                                id="_IDGenMeasureDefinition1"
+                                                id="idMeasureDefinition"
                                                 name="Count"
                                                 value="{ParkingLotModel>Count}"
                                             />
@@ -64,16 +76,16 @@
 
                                 <viz:feeds>
                                     <viz.feeds:FeedItem
-                                        id="_IDGenFeedItem1"
-                                        uid="size"
+                                        id="FeedItem89875"
+                                        uid="valueAxis"
                                         type="Measure"
                                         values="Count"
                                     />
                                     <viz.feeds:FeedItem
-                                        id="_IDGenFeedItem2"
-                                        uid="color"
+                                        id="idFeedItem1"
+                                        uid="categoryAxis"
                                         type="Dimension"
-                                        values="status"
+                                        values="Status"
                                     />
                                 </viz:feeds>
                             </viz:VizFrame>

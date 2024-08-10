@@ -4,31 +4,28 @@
     xmlns="sap.m"
 >
     <Dialog
-        id="dialog"
+        id="iddialogFromReservetions"
         resizable="false"
         draggable="true"
         contentWidth="30%"
         title="Confirmation to Reserve a Slot for Vendor:"
     >
         <beginButton>
-            <Button
-                id="idReserveConfirm"
+            <Button id="_IDGenButton1"
                 text="Reserve"
                 press="onReserveSlotBtnPress"
                 type="Transparent"
             />
         </beginButton>
         <endButton>
-            <Button
-                id="idCancelreserveslotButton"
+            <Button id="_IDGenButton2"
                 text="Cancel"
                 press="onCloseReserveSlotDialog"
                 type="Transparent"
             />
         </endButton>
         <content>
-            <form:SimpleForm
-                id="idReserveSlotConfirmForm"
+            <form:SimpleForm id="_IDGenSimpleForm1"
                 editable="true"
                 layout="ResponsiveGridLayout"
                 labelSpanXL="3"
@@ -46,7 +43,7 @@
                 singleContainerFullSize="false"
             >
                 <Label
-                    id="idLableName"
+                    id="idLableName1"
                     text="Vendor Name"
                 />
                 <Input
@@ -55,7 +52,7 @@
                     editable="false"
                 />
                 <Label
-                    id="idLableNumber"
+                    id="idLableNumber2"
                     text="Vendor Number"
                 />
                 <Input
@@ -64,7 +61,7 @@
                     editable="false"
                 />
                 <Label
-                    id="idLableDriverName"
+                    id="idLableDriverName3"
                     text="Driver Name"
                 />
                 <Input
@@ -73,7 +70,7 @@
                     editable="false"
                 />
                 <Label
-                    id="idLablePhoneNumber"
+                    id="idLablePhoneNumber4"
                     text="Driver Number"
                 />
                 <Input
@@ -83,7 +80,7 @@
                 />
 
                 <Label
-                    id="idLableVehicleType"
+                    id="idLableVehicleType5"
                     text="Vehicle Type"
                 />
                 <Input
@@ -92,7 +89,7 @@
                     editable="false"
                 />
                 <Label
-                    id="idLableVehicleNumber"
+                    id="idLableVehicleNumber6"
                     text="Vehicle Number"
                 />
                 <Input
@@ -100,21 +97,29 @@
                     value="{oConfirmRequestModel>/vehicleNumber}"
                     editable="false"
                 />
+                <Label id="_IDGenLabel1"
+                    text="Service Type"
+                />
+                <Input
+                    id="idInputServiceType7"
+                    value="{oConfirmRequestModel>/serviceType}"
+                    editable="false"
+                />
                 <Label
-                    id="idLableSlotNum"
+                    id="idLableSlotNum8"
                     text="Select Slot"
                 />
-                <Select
+                <ComboBox
                     id="idselectSlotReserve"
-                    width="80%"
-                    items="{path: '/AllSlots', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}]}"
+                    placeholder="Please Select Slot from Dropdown"
+                    items="{path: '/AllSlots', filters: [{path: 'status', operator: 'EQ', value1: 'Available'}, {path: 'serviceType', operator: 'EQ', value1: '{oConfirmRequestModel>/serviceType}'}]}"
                 >
                     <core:Item
                         id="idCoreSelectSlot"
                         key="{ID}"
                         text="{slotNumber}"
                     />
-                </Select>
+                </ComboBox>
             </form:SimpleForm>
         </content>
     </Dialog>

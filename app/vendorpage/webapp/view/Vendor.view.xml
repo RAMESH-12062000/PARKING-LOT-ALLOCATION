@@ -1,4 +1,5 @@
 <mvc:View
+    xmlns:core="sap.ui.core"
     controllerName="com.app.vendorpage.controller.Vendor"
     xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
@@ -134,6 +135,31 @@
                                     id="idVehNumberInput"
                                     placeholder="Enter Vehicle Number..."
                                 />
+                                <VBox id="idVBoxforServicetype">
+                                    <Label
+                                        id="idLabelServiceType"
+                                        text="Service Type:"
+                                        labelFor="passwordInput"
+                                        class="sapUiSmallMarginTop"
+                                        required="true"
+                                    />
+                                    <ComboBox
+                                        id="idTypeofTransport"
+                                        placeholder="Please select Service Type from Dropdown"
+                                        width="100%"
+                                    >
+                                        <core:Item
+                                            id="IDGenItem1234"
+                                            key="InBound"
+                                            text="InBound"
+                                        />
+                                        <core:Item
+                                            id="IDGenItem12344"
+                                            key="OutBound"
+                                            text="OutBound"
+                                        />
+                                    </ComboBox>
+                                </VBox>
                                 <HBox
                                     id="idHBox"
                                     class="sapUiSmallMarginTop"

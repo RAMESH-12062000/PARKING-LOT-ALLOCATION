@@ -20,7 +20,7 @@
                     id="IDGenImage1"
                     height="1.5rem"
                     class="sapUiSmallMarginBegin"
-                    src="https://www.sap.com/dam/application/shared/logos/sap-logo-svg.svg"
+                    src="https://i.postimg.cc/3wBkmqjQ/Artihcus-logo-1-transformed.png"
                 />
                 <Button
                     id="sideNavigationToggleButton"
@@ -113,6 +113,7 @@
                     tooltip="Data Visualization"
                     icon="sap-icon://bar-chart"
                     press="onGeographicBtnPress"
+                    class="BarChartBtn"
                 />
                 <Button
                     id="IDGenButton2"
@@ -122,6 +123,10 @@
                 />
             </tnt:ToolHeader>
         </tnt:header>
+        <tnt:subHeader>
+            <tnt:ToolHeader />
+        </tnt:subHeader>
+
         <!-- LeftSide Pannel Section -->
         <tnt:sideContent>
             <tnt:SideNavigation
@@ -243,6 +248,28 @@
                                         />
                                     </Toolbar>
                                     <Label
+                                        id="IDGenLabel6"
+                                        text="Service Type"
+                                        required="true"
+                                    />
+                                    <odata:ComboBox
+                                        id="idTypeOfDelivery"
+                                        placeholder="Please Selct Service Type from Dropdown.."
+                                        width="80%"
+                                        change="onServiceTypeChange"
+                                    >
+                                        <core:Item
+                                            id="_IDGenItem234"
+                                            key="InBound"
+                                            text="InBound"
+                                        />
+                                        <core:Item
+                                            id="_IDGenItem2344"
+                                            key="OutBound"
+                                            text="OutBound"
+                                        />
+                                    </odata:ComboBox>
+                                    <Label
                                         id="IDGenLabel1"
                                         text="Slot Number"
                                         required="true"
@@ -297,29 +324,8 @@
                                     />
                                     <Input
                                         id="idvehicleType"
-                                        width="80%"
                                         placeholder="enter Vehicle Type.."
                                     />
-                                    <Label
-                                        id="IDGenLabel6"
-                                        text="Service Type:"
-                                        required="true"
-                                    />
-                                    <odata:ComboBox
-                                        id="idTypeOfDelivery"
-                                        placeholder="Please Selct Service Type from Dropdown.."
-                                    >
-                                        <core:Item
-                                            id="_IDGenItem234"
-                                            key="InBound"
-                                            text="InBound"
-                                        />
-                                        <core:Item
-                                            id="_IDGenItem2344"
-                                            key="OutBound"
-                                            text="OutBound"
-                                        />
-                                    </odata:ComboBox>
                                     <HBox
                                         id="IDGenHBox2"
                                         justifyContent="End"
@@ -438,6 +444,16 @@
                                                 key="Reserved"
                                                 text="Reserved"
                                             />
+                                            <core:Item
+                                                id="idCoreInBound"
+                                                key="InBound"
+                                                text="InBound"
+                                            />
+                                            <core:Item
+                                                id="idCoreOutBound"
+                                                key="OutBound"
+                                                text="OutBound"
+                                            />
                                         </m:ComboBox>
                                     </Toolbar>
                                     <Table
@@ -450,18 +466,21 @@
                                                 <Text
                                                     id="IDGenText5"
                                                     text="Slot Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn2">
                                                 <Text
                                                     id="IDGenText6"
                                                     text="Service Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn3">
                                                 <Text
                                                     id="IDGenText7"
                                                     text="Status: (Available/Occupaid)"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                         </columns>
@@ -575,12 +594,14 @@
                                             text="Save"
                                             type="Transparent"
                                             press="onSave"
+                                            class="SaveBtnFromAllocatedSlots"
                                             visible="false"
                                         />
                                         <Button
                                             id="cancelButton"
                                             text="Cancel"
                                             type="Transparent"
+                                            class="CancelBtnFromAllocatedSlots"
                                             press="onCancel"
                                             visible="false"
                                         />
@@ -596,56 +617,58 @@
                                                 <Text
                                                     id="IDGenAllocatedText1"
                                                     text="Slot Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="Allocatedcol7">
                                                 <Text
                                                     id="IDGenAllocatedText7"
                                                     text="Vehicle Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="Allocatedcol2">
                                                 <Text
                                                     id="IDGenAllocatedTextt2"
                                                     text="Vehicle Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="Allocatedcol3">
                                                 <Text
                                                     id="IDGenAllocatedText3"
                                                     text="Driver Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="Allocatedcol4">
                                                 <Text
                                                     id="IDGenAllocatedText4"
                                                     text="Driver Name:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="Allocatedcol8">
                                                 <Text
                                                     id="IDGenAllocatedText8"
                                                     text="Service Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="Allocatedcol5">
                                                 <Text
                                                     id="IDGenAllocatedText5"
                                                     text="In Time:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDAllocated6">
                                                 <Text
                                                     id="IDGenAllocatedText6"
                                                     text="Un Assign:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
-                                            <!-- <Column id="Allocatedcol6">
-                                                <Text
-                                                    id="IDGenAllocatedText6"
-                                                    text="Out Time:"
-                                                />
-                                            </Column> -->
                                         </columns>
                                         <items>
                                             <ColumnListItem
@@ -677,18 +700,46 @@
                                                         id="IDGenText07"
                                                         text="{vehicleType}"
                                                     />
-                                                    <Text
-                                                        id="IDGenText02"
-                                                        text="{vehicleNumber}"
-                                                    />
-                                                    <Text
-                                                        id="IDGenText03"
-                                                        text="{driverNumber}"
-                                                    />
-                                                    <Text
-                                                        id="IDGenText04"
-                                                        text="{driverName}"
-                                                    />
+                                                    <m:VBox
+                                                        id="idVBoxVehicleNumber"
+                                                    >
+                                                        <Text
+                                                            id="IDGenText02"
+                                                            text="{vehicleNumber}"
+                                                            visible="true"
+                                                        />
+                                                        <m:Input
+                                                            id="idInputVehicle"
+                                                            value="{vehicleNumber}"
+                                                            visible="false"
+                                                        />
+                                                    </m:VBox>
+                                                    <m:VBox
+                                                        id="idVBoxDriverNumber"
+                                                    >
+                                                        <Text
+                                                            id="IDGenText03"
+                                                            text="{driverNumber}"
+                                                        />
+                                                        <m:Input
+                                                            id="idInputDriverNumber"
+                                                            value="{driverNumber}"
+                                                            visible="false"
+                                                        />
+                                                    </m:VBox>
+                                                    <m:VBox
+                                                        id="idVBoxDriverName"
+                                                    >
+                                                        <Text
+                                                            id="IDGenText04"
+                                                            text="{driverName}"
+                                                        />
+                                                        <m:Input
+                                                            id="idInputDriverName"
+                                                            value="{driverName}"
+                                                            visible="false"
+                                                        />
+                                                    </m:VBox>
                                                     <Text
                                                         id="IDGenText08"
                                                         text="{serviceType}"
@@ -769,14 +820,13 @@
                                             id="idBtnReject"
                                             text="Reject"
                                             press="onRejectConfirmSlotPress"
-                                            type="Transparent"
                                             class="reservationrejectbtn"
                                         />
                                         <m:Button
                                             id="idBtnRequest"
                                             text="Confirm"
                                             press="onConfirmRequestSlotPress"
-                                            type="Transparent"
+                                            class="confirmReservationBtn"
                                         />
                                     </Toolbar>
                                 </form:toolbar>
@@ -810,42 +860,56 @@
                                                 <Text
                                                     id="IDGenText001"
                                                     text="Vendor Name:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn002">
                                                 <Text
                                                     id="IDGenText002"
                                                     text="Vendor Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn003">
                                                 <Text
                                                     id="IDGenText003"
                                                     text="Driver Name:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn004">
                                                 <Text
                                                     id="IDGenText004"
                                                     text="Driver Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn005">
                                                 <Text
                                                     id="IDGenText005"
                                                     text="Vehicle Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn006">
                                                 <Text
                                                     id="IDGenText006"
                                                     text="Vehicle Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn007">
                                                 <Text
                                                     id="IDGenText007"
+                                                    text="Service Type:"
+                                                    class="HedingNameColor"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn008">
+                                                <Text
+                                                    id="IDGenText008"
                                                     text="Reserve Date:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                         </columns>
@@ -880,6 +944,10 @@
                                                     />
                                                     <Text
                                                         id="IDGenAvailText7"
+                                                        text="{serviceType}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenAvailText8"
                                                         text="{inTime}"
                                                     />
                                                 </cells>
@@ -923,21 +991,21 @@
                                     <Toolbar id="TB5">
                                         <Title
                                             id="Title1489045"
-                                            text="RESERVED SLOTS FROM VENDORS:"
+                                            text="RESERVED SLOTS FOR VENDORS:"
                                         />
                                         <ToolbarSpacer id="IDGenToolbar567" />
                                         <m:Button
                                             id="idBtnReServeAssignConfirm"
                                             text="Assign"
+                                            class="AssignBtnfromReservedSlots"
                                             press="onAssignConfirmReserveSlot"
-                                            type="Transparent"
                                             tooltip="ReservedSlotConfirm"
                                             icon="sap-icon://activity-assigned-to-goal"
                                         />
                                         <m:Button
                                             id="idButtonSortingReservedSlots"
                                             icon="sap-icon://sort"
-                                            press="onSortingAllTablesBySlotNumber"
+                                            press="onSortingReservedSlotsTable"
                                             tooltip="Sort"
                                         />
                                     </Toolbar>
@@ -972,42 +1040,56 @@
                                                 <Text
                                                     id="IDGenText91"
                                                     text="Vendor Name:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn9001">
                                                 <Text
                                                     id="IDGenText92"
                                                     text="Vendor Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn9002">
                                                 <Text
                                                     id="IDGenText93"
                                                     text="Driver Name:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn9003">
                                                 <Text
                                                     id="IDGenText94"
                                                     text="Driver Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn9004">
                                                 <Text
                                                     id="IDGenText95"
                                                     text="Reserved Slot:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn9005">
                                                 <Text
                                                     id="IDGenText96"
-                                                    text="Vehicle Type:"
+                                                    text="Service Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn9006">
                                                 <Text
                                                     id="IDGenText97"
                                                     text="Vehicle Number:"
+                                                    class="HedingNameColor"
+                                                />
+                                            </Column>
+                                            <Column id="IDGenColumn9007">
+                                                <Text
+                                                    id="IDGenText98"
+                                                    text="Vehicle Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                         </columns>
@@ -1039,11 +1121,15 @@
                                                     />
                                                     <Text
                                                         id="IDGenReserveText6"
-                                                        text="{vehicleType}"
+                                                        text="{serviceType}"
                                                     />
                                                     <Text
                                                         id="IDGenReserveText7"
                                                         text="{vehicleNumber}"
+                                                    />
+                                                    <Text
+                                                        id="IDGenReserveText8"
+                                                        text="{vehicleType}"
                                                     />
                                                 </cells>
                                             </ColumnListItem>
@@ -1126,48 +1212,56 @@
                                                 <Text
                                                     id="IDGenText0011"
                                                     text="Slot Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0022">
                                                 <Text
                                                     id="IDGenText0022"
                                                     text="Service Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0088">
                                                 <Text
                                                     id="IDGenText0088"
                                                     text="Vehicle Type:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0033">
                                                 <Text
                                                     id="IDGenText0033"
                                                     text="Vehicle Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0044">
                                                 <Text
                                                     id="IDGenText0044"
                                                     text="Driver Number:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0055">
                                                 <Text
                                                     id="IDGenText0055"
                                                     text="Driver Name:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0066">
                                                 <Text
                                                     id="IDGenText0066"
                                                     text="In Time:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                             <Column id="IDGenColumn0077">
                                                 <Text
                                                     id="IDGenText0077"
                                                     text="Out Time:"
+                                                    class="HedingNameColor"
                                                 />
                                             </Column>
                                         </columns>

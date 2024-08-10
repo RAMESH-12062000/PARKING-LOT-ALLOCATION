@@ -43,7 +43,7 @@
     justify-content: flex-start;
     align-items: flex-start;
     position: relative;
-    left: 2rem;
+    left: 2.5rem;
 }
 
 .descriptionContainer {
@@ -74,7 +74,7 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     max-width: 400px;
-    width: 100%;
+    width: 400% !important;
     text-align: start;
     margin: auto;
     transition: all 0.5s ease-out;
