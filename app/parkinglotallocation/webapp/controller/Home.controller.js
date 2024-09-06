@@ -1290,7 +1290,7 @@ sap.ui.define([
             //     }
             // },
 
-            /** After Getting the Reserved Slot Data, Before assign the slot pls check the details, here u can change(here slot can't changed.!).
+            /** After Getting the Reserved Slot Data, Before assign the slot pls check the details, here u can change(here slot and Service Type can't changed.!).
             press on the Assign buttin the slot will trigger at Allocated slots and slot status will be Changed... */
             //"ASSIGN Btn" from Reserved Slots(in Pop-up)
             onReserveSlotConfirmAssignBtnPress: async function () {
